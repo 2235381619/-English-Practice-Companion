@@ -176,6 +176,10 @@ public class LoopAgentTest {
                         System.out.println(event.stringifyContent());
                     }
                 });
+
+        // loop(llmagent01、llmagent02、llmagent03)、sequential(llmagent01、loop)
+        // loop(llmagent01、llmagent02、llmagent03)、parallel(llmagent04、llmagent05)、sequential(llmagent01、loop、parallel01、llmagent02)
+        // loop(llmagent01、llmagent02、llmagent03)、parallel(llmagent04、llmagent05)、sequential(llmagent01、loop、parallel01、llmagent02)、loop(sequential01)
     }
 
 }
