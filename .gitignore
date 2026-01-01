@@ -39,3 +39,4 @@ build/
 /.mvn/
 /.idea/
 /data/
+/ai-agent-scaffold-lite-app/data/

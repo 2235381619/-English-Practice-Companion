@@ -2,8 +2,8 @@ ai:
   agent:
     config:
       tables:
-        testAgent:
-          app-name: testAgent
+        testAgent01:
+          app-name: testAgent01
           agent:
             agent-id: 100001
             agent-name: 测试智能体01
