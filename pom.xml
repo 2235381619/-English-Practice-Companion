@@ -36,6 +36,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <google.adk.version>0.5.0</google.adk.version>
     </properties>
 
     <developers>
@@ -119,25 +120,25 @@
             <dependency>
                 <groupId>com.google.adk</groupId>
                 <artifactId>google-adk</artifactId>
-                <version>0.4.0</version>
+                <version>${google.adk.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.google.adk</groupId>
                 <artifactId>google-adk-dev</artifactId>
-                <version>0.4.0</version>
+                <version>${google.adk.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.google.adk</groupId>
                 <artifactId>google-adk-spring-ai</artifactId>
-                <version>0.4.0</version>
+                <version>${google.adk.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.google.adk.samples</groupId>
                 <artifactId>google-adk-sample-helloworld</artifactId>
-                <version>0.4.0</version>
+                <version>${google.adk.version}</version>
             </dependency>
 
             <dependency>
