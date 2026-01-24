@@ -1,0 +1,467 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="${version}" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f4bef0ac-210b-4578-9f59-aa854fd70bf9" name="Changes" comment="feat: ignore">
+      <change afterPath="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/dev-ops/nginx/html/archetype-catalog.xml" afterDir="false" />
+      <change afterPath="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/maven/archetype/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/maven/create-project.sh" afterDir="false" />
+      <change beforePath="${symbol_dollar}PROJECT_DIR${symbol_dollar}/pom.xml" beforeDir="false" afterPath="${symbol_dollar}PROJECT_DIR${symbol_dollar}/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="${symbol_dollar}PROJECT_DIR${symbol_dollar}" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="${symbol_dollar}PROJECT_DIR${symbol_dollar}" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;fuzhengwei&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:xfg-studio-project/${artifactId}.git&quot;,
+    &quot;accountId&quot;: &quot;f2b0cb69-35bf-4d20-bae1-4e965f108775&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="36oYUGAJpfdFwiKoNdRdG9wefEk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ApiPost:METDOD_SEND_RECORD:${artifactId}-trigger": "{${symbol_escape}"/api/v1/query_ai_agent_config_list${symbol_escape}":[{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"Fail to send:http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}nConnectException: Connection refused${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":33.0,${symbol_escape}"second${symbol_escape}":37.0,${symbol_escape}"nano${symbol_escape}":1.80591E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"Fail to send:http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}nConnectException: Connection refused${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":1${version},${symbol_escape}"nano${symbol_escape}":1.64496E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"Fail to send:http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}nConnectException: Connection refused${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":1${version},${symbol_escape}"nano${symbol_escape}":9.74425E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"Fail to send:http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}nConnectException: Connection refused${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":12.0,${symbol_escape}"nano${symbol_escape}":2.0347E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8091/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}${symbol_escape}"code${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"0000${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"info${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"成功${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"data${symbol_escape}${symbol_escape}${symbol_escape}":[{${symbol_escape}${symbol_escape}${symbol_escape}"agentId${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"100003${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"agentName${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"单一智能体${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"agentDesc${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"单一智能体${symbol_escape}${symbol_escape}${symbol_escape}"}]}${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{${symbol_escape}"null${symbol_escape}":[${symbol_escape}"HTTP/1.1 200${symbol_escape}"],${symbol_escape}"Transfer-Encoding${symbol_escape}":[${symbol_escape}"chunked${symbol_escape}"],${symbol_escape}"Keep-Alive${symbol_escape}":[${symbol_escape}"timeout${symbol_escape}${symbol_escape}u003d60${symbol_escape}"],${symbol_escape}"Connection${symbol_escape}":[${symbol_escape}"keep-alive${symbol_escape}"],${symbol_escape}"Vary${symbol_escape}":[${symbol_escape}"Origin${symbol_escape}",${symbol_escape}"Access-Control-Request-Method${symbol_escape}",${symbol_escape}"Access-Control-Request-Headers${symbol_escape}"],${symbol_escape}"Date${symbol_escape}":[${symbol_escape}"Tue, 20 Jan 2026 00:34:24 GMT${symbol_escape}"],${symbol_escape}"Content-Type${symbol_escape}":[${symbol_escape}"application/json${symbol_escape}"]},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":24.0,${symbol_escape}"nano${symbol_escape}":2.671E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"Fail to send:http://localhost:8901/api/v1/query_ai_agent_config_list${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}nConnectException: Connection refused${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":28.0,${symbol_escape}"nano${symbol_escape}":3.28204E8}}},{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8091/api/v1/query_ai_agent_config_list${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"none${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}${symbol_escape}"code${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"0000${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"info${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"成功${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"data${symbol_escape}${symbol_escape}${symbol_escape}":[{${symbol_escape}${symbol_escape}${symbol_escape}"agentId${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"100003${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"agentName${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"单一智能体${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"agentDesc${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"单一智能体${symbol_escape}${symbol_escape}${symbol_escape}"}]}${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{${symbol_escape}"null${symbol_escape}":[${symbol_escape}"HTTP/1.1 200${symbol_escape}"],${symbol_escape}"Transfer-Encoding${symbol_escape}":[${symbol_escape}"chunked${symbol_escape}"],${symbol_escape}"Keep-Alive${symbol_escape}":[${symbol_escape}"timeout${symbol_escape}${symbol_escape}u003d60${symbol_escape}"],${symbol_escape}"Connection${symbol_escape}":[${symbol_escape}"keep-alive${symbol_escape}"],${symbol_escape}"Vary${symbol_escape}":[${symbol_escape}"Origin${symbol_escape}",${symbol_escape}"Access-Control-Request-Method${symbol_escape}",${symbol_escape}"Access-Control-Request-Headers${symbol_escape}"],${symbol_escape}"Date${symbol_escape}":[${symbol_escape}"Tue, 20 Jan 2026 00:34:38 GMT${symbol_escape}"],${symbol_escape}"Content-Type${symbol_escape}":[${symbol_escape}"application/json${symbol_escape}"]},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":38.0,${symbol_escape}"nano${symbol_escape}":4.13047E8}}}],${symbol_escape}"/api/v1/create_session${symbol_escape}":[{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8091/api/v1/create_session${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"json${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"agentId${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"100003${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"userId${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"xiaofuge${symbol_escape}${symbol_escape}${symbol_escape}"${symbol_escape}${symbol_escape}n}${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[{${symbol_escape}"key${symbol_escape}":${symbol_escape}"agentId${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":${version},${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"},{${symbol_escape}"key${symbol_escape}":${symbol_escape}"userId${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":${version},${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"}]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}${symbol_escape}"code${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"0000${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"info${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"成功${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"data${symbol_escape}${symbol_escape}${symbol_escape}":{${symbol_escape}${symbol_escape}${symbol_escape}"sessionId${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"aa74f094-406d-4d99-b9b9-6eb8be253aae${symbol_escape}${symbol_escape}${symbol_escape}"}}${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{${symbol_escape}"null${symbol_escape}":[${symbol_escape}"HTTP/1.1 200${symbol_escape}"],${symbol_escape}"Transfer-Encoding${symbol_escape}":[${symbol_escape}"chunked${symbol_escape}"],${symbol_escape}"Keep-Alive${symbol_escape}":[${symbol_escape}"timeout${symbol_escape}${symbol_escape}u003d60${symbol_escape}"],${symbol_escape}"Connection${symbol_escape}":[${symbol_escape}"keep-alive${symbol_escape}"],${symbol_escape}"Vary${symbol_escape}":[${symbol_escape}"Origin${symbol_escape}",${symbol_escape}"Access-Control-Request-Method${symbol_escape}",${symbol_escape}"Access-Control-Request-Headers${symbol_escape}"],${symbol_escape}"Date${symbol_escape}":[${symbol_escape}"Tue, 20 Jan 2026 00:34:59 GMT${symbol_escape}"],${symbol_escape}"Content-Type${symbol_escape}":[${symbol_escape}"application/json${symbol_escape}"]},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"GET${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026.0,${symbol_escape}"month${symbol_escape}":${version},${symbol_escape}"day${symbol_escape}":20.0},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8.0,${symbol_escape}"minute${symbol_escape}":34.0,${symbol_escape}"second${symbol_escape}":59.0,${symbol_escape}"nano${symbol_escape}":2.31116E8}}}],${symbol_escape}"/api/v1/chat${symbol_escape}":[{${symbol_escape}"url${symbol_escape}":${symbol_escape}"http://localhost:8091/api/v1/chat${symbol_escape}",${symbol_escape}"header${symbol_escape}":[],${symbol_escape}"query${symbol_escape}":[],${symbol_escape}"rest${symbol_escape}":[],${symbol_escape}"cookie${symbol_escape}":[],${symbol_escape}"body${symbol_escape}":{${symbol_escape}"mode${symbol_escape}":${symbol_escape}"json${symbol_escape}",${symbol_escape}"parameter${symbol_escape}":[],${symbol_escape}"raw${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"agentId${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"100003${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"userId${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"xiaofuge${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"sessionId${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"aa74f094-406d-4d99-b9b9-6eb8be253aae${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}n    ${symbol_escape}${symbol_escape}${symbol_escape}"message${symbol_escape}${symbol_escape}${symbol_escape}": ${symbol_escape}${symbol_escape}${symbol_escape}"你能做什么${symbol_escape}${symbol_escape}${symbol_escape}"${symbol_escape}${symbol_escape}n}${symbol_escape}",${symbol_escape}"raw_para${symbol_escape}":[{${symbol_escape}"key${symbol_escape}":${symbol_escape}"agentId${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":1,${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"},{${symbol_escape}"key${symbol_escape}":${symbol_escape}"userId${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":1,${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"},{${symbol_escape}"key${symbol_escape}":${symbol_escape}"sessionId${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":1,${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"},{${symbol_escape}"key${symbol_escape}":${symbol_escape}"message${symbol_escape}",${symbol_escape}"value${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"type${symbol_escape}":${symbol_escape}"Text${symbol_escape}",${symbol_escape}"description${symbol_escape}":${symbol_escape}"${symbol_escape}",${symbol_escape}"is_checked${symbol_escape}":1,${symbol_escape}"not_null${symbol_escape}":${symbol_escape}"0${symbol_escape}",${symbol_escape}"field_type${symbol_escape}":${symbol_escape}"String${symbol_escape}"}]},${symbol_escape}"responseBody${symbol_escape}":${symbol_escape}"{${symbol_escape}${symbol_escape}${symbol_escape}"code${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"0000${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"info${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"成功${symbol_escape}${symbol_escape}${symbol_escape}",${symbol_escape}${symbol_escape}${symbol_escape}"data${symbol_escape}${symbol_escape}${symbol_escape}":{${symbol_escape}${symbol_escape}${symbol_escape}"content${symbol_escape}${symbol_escape}${symbol_escape}":${symbol_escape}${symbol_escape}${symbol_escape}"你好！我是“onlyAgent”，专注于“小傅哥学习项目计划”为主题的智能助手。我可以帮助你：${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n1. 检索和整理关于小傅哥编程实战项目的资料，包括项目介绍、实战案例、学习资源等；${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n2. 针对你的学习阶段或需求，制定循序渐进的学习计划，推荐适合的实战项目；${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n3. 解答与编程实战、开发工具、项目经验等相关的常见问题，或提供查找资源的方法；${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n4. 提供初学者编程路线建议，帮助你高效规划学习过程；${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n5. 说明如何利用小傅哥的项目提升实战能力，比如代码实现、项目结构、代码复盘等。${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n${symbol_escape}${symbol_escape}${symbol_escape}${symbol_escape}n如果你想了解小傅哥的实战项目资源、学习方法，或需要一份具体的项目练习计划，请告诉我你的需求或基础，我会为你量身定制学习内容！${symbol_escape}${symbol_escape}${symbol_escape}"}}${symbol_escape}",${symbol_escape}"responseHeader${symbol_escape}":{${symbol_escape}"null${symbol_escape}":[${symbol_escape}"HTTP/1.1 200${symbol_escape}"],${symbol_escape}"Transfer-Encoding${symbol_escape}":[${symbol_escape}"chunked${symbol_escape}"],${symbol_escape}"Keep-Alive${symbol_escape}":[${symbol_escape}"timeout${symbol_escape}${symbol_escape}u003d60${symbol_escape}"],${symbol_escape}"Connection${symbol_escape}":[${symbol_escape}"keep-alive${symbol_escape}"],${symbol_escape}"Vary${symbol_escape}":[${symbol_escape}"Origin${symbol_escape}",${symbol_escape}"Access-Control-Request-Method${symbol_escape}",${symbol_escape}"Access-Control-Request-Headers${symbol_escape}"],${symbol_escape}"Date${symbol_escape}":[${symbol_escape}"Tue, 20 Jan 2026 00:35:24 GMT${symbol_escape}"],${symbol_escape}"Content-Type${symbol_escape}":[${symbol_escape}"application/json${symbol_escape}"]},${symbol_escape}"responseCookieList${symbol_escape}":[],${symbol_escape}"selectedItem${symbol_escape}":${symbol_escape}"POST${symbol_escape}",${symbol_escape}"time${symbol_escape}":{${symbol_escape}"date${symbol_escape}":{${symbol_escape}"year${symbol_escape}":2026,${symbol_escape}"month${symbol_escape}":1,${symbol_escape}"day${symbol_escape}":20},${symbol_escape}"time${symbol_escape}":{${symbol_escape}"hour${symbol_escape}":8,${symbol_escape}"minute${symbol_escape}":35,${symbol_escape}"second${symbol_escape}":24,${symbol_escape}"nano${symbol_escape}":655567000}}}]}",
+    "Application.ApiTest (1).executor": "Run",
+    "Application.ApiTest (2).executor": "Debug",
+    "Application.ApiTest.executor": "Run",
+    "Application.Application.executor": "Run",
+    "Application.LangChain4jAiTest.executor": "Run",
+    "Application.LangChain4jApiTest.executor": "Run",
+    "Application.LangChain4jToolTest.executor": "Run",
+    "Application.SequentialAgentTest.executor": "Run",
+    "Application.SpringAiApiTest.executor": "Run",
+    "Application.SpringAiTest.executor": "Run",
+    "Application.SpringAiToolTest.executor": "Run",
+    "JUnit.AiAgentAutoConfigTest.test_agent.executor": "Run",
+    "JUnit.AiAgentAutoConfigTest.test_handlerMessage_02.executor": "Debug",
+    "JUnit.AiAgentAutoConfigTest.test_handlerMessage_03.executor": "Debug",
+    "JUnit.AiAgentAutoConfigTest.test_handlerMessage_file.executor": "Run",
+    "JUnit.ChatServiceTest.test_handleMessage_01.executor": "Run",
+    "JUnit.ChatServiceTest.test_handleMessage_04_withImage.executor": "Run",
+    "JUnit.SpringAiToolTest.test.executor": "Run",
+    "JUnit.SpringAiToolTest.test_url.executor": "Run",
+    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
+    "Maven.${artifactId} [clean].executor": "Run",
+    "Maven.${artifactId} [org.apache.maven.plugins:maven-archetype-plugin:3.2.0:create-from-project].executor": "Run",
+    "Maven.${artifactId} [org.apache.maven.plugins:maven-archetype-plugin:3.2.0:generate].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "3-1-maven-archetype-plugin",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/fuzhengwei/coding/gitcode/KnowledgePlanet/ai-agent-scaffold/${artifactId}/docs/maven/archetype",
+    "settings.editor.selected.configurable": "MavenSettings"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/maven/archetype" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/target/${artifactId}-archetype/src/main/resources/archetype-resources/.idea" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/target/${artifactId}-archetype/src/main/resources/archetype-resources" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/dev-ops/nginx/html" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/${artifactId}-app/src/main/resources/file" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/maven" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/dev-ops/nginx/html/js" />
+      <recent name="${symbol_dollar}PROJECT_DIR${symbol_dollar}/docs/dev-ops/nginx/html/images" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="${package}.config" />
+      <recent name="${package}.domain.agent.model.valobj.properties" />
+      <recent name="${package}.domain.agent.model.valobj" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.AiAgentAutoConfigTest.test_handlerMessage_03">
+    <configuration name="LangChain4jToolTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="${package}.test.api.tool.LangChain4jToolTest" />
+      <module name="${artifactId}-app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="${package}.test.api.tool.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SequentialAgentTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="${package}.test.api.agent.SequentialAgentTest" />
+      <module name="${artifactId}-app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="${package}.test.api.agent.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SpringAiApiTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="${package}.test.api.model.SpringAiApiTest" />
+      <module name="${artifactId}-app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="${package}.test.api.model.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SpringAiToolTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="${package}.test.api.tool.SpringAiToolTest" />
+      <module name="${artifactId}-app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="${package}.test.api.tool.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AiAgentAutoConfigTest.test_handlerMessage_03" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="${artifactId}-app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="${package}.test.app.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="${package}.test.app" />
+      <option name="MAIN_CLASS_NAME" value="${package}.test.app.AiAgentAutoConfigTest" />
+      <option name="METHOD_NAME" value="test_handlerMessage_03" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AiAgentAutoConfigTest.test_handlerMessage_03" />
+        <item itemvalue="Application.SpringAiToolTest" />
+        <item itemvalue="Application.SpringAiApiTest" />
+        <item itemvalue="Application.SequentialAgentTest" />
+        <item itemvalue="Application.LangChain4jToolTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f4bef0ac-210b-4578-9f59-aa854fd70bf9" name="Changes" comment="" />
+      <created>1765674404411</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765674404411</updated>
+    </task>
+    <task id="LOCAL-00001" summary="feat: init project">
+      <option name="closed" value="true" />
+      <created>1765674498611</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765674498611</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat: 第2-1节：工程初始化创建">
+      <option name="closed" value="true" />
+      <created>1765674654351</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765674654351</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat: 第2-2节：Api功能测试">
+      <option name="closed" value="true" />
+      <created>1765841153176</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1765841153176</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat: 第2-3节：智能体配置表设计">
+      <option name="closed" value="true" />
+      <created>1765929552284</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1765929552284</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: 第2-4节：装配域结构化定义">
+      <option name="closed" value="true" />
+      <created>1766103621187</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1766103621187</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: 第2-5节：装配域节点-AiApiNode">
+      <option name="closed" value="true" />
+      <created>1766449307963</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1766449307963</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: 第2-6节：装配域节点-ChatModelNode">
+      <option name="closed" value="true" />
+      <created>1766536553501</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1766536553501</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: 第2-7节：装配域节点-AgentNode">
+      <option name="closed" value="true" />
+      <created>1766623006949</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766623006949</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: 第2-8节：装配域节点-AgentWorkflowNode">
+      <option name="closed" value="true" />
+      <created>1766709698155</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1766709698155</updated>
+    </task>
+    <task id="LOCAL-00010" summary="feat: 第2-9节：装配域节点-Loop、Parallel、Sequential">
+      <option name="closed" value="true" />
+      <created>1766976098894</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1766976098894</updated>
+    </task>
+    <task id="LOCAL-00011" summary="feat: ignore">
+      <option name="closed" value="true" />
+      <created>1766978553799</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1766978553799</updated>
+    </task>
+    <task id="LOCAL-00012" summary="feat: 第2-10节：装配域节点-RunnerNode">
+      <option name="closed" value="true" />
+      <created>1766996309196</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1766996309196</updated>
+    </task>
+    <task id="LOCAL-00013" summary="feat: 第2-11节：智能体加载使用验证">
+      <option name="closed" value="true" />
+      <created>1767062963230</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1767062963230</updated>
+    </task>
+    <task id="LOCAL-00014" summary="feat: 第2-12节：增强装配-RunnerNode">
+      <option name="closed" value="true" />
+      <created>1767231526105</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1767231526105</updated>
+    </task>
+    <task id="LOCAL-00015" summary="feat: 第2-13：增强装配-AgentWorkflowNode">
+      <option name="closed" value="true" />
+      <created>1767261386087</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1767261386087</updated>
+    </task>
+    <task id="LOCAL-00016" summary="feat: 第2-14节：增强装配-本地mcp">
+      <option name="closed" value="true" />
+      <created>1767320749981</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1767320749981</updated>
+    </task>
+    <task id="LOCAL-00017" summary="feat: 第2-15节：增强装配-回调plugin">
+      <option name="closed" value="true" />
+      <created>1767487367668</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767487367668</updated>
+    </task>
+    <task id="LOCAL-00018" summary="feat: 第2-16节：fix-多模态能力使用">
+      <option name="closed" value="true" />
+      <created>1767919504384</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1767919504384</updated>
+    </task>
+    <task id="LOCAL-00019" summary="feat: 第2-17节：会话服务接口实现-service">
+      <option name="closed" value="true" />
+      <created>1768642654045</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1768642654045</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: 第2-18节：会话服务接口实现-trigger">
+      <option name="closed" value="true" />
+      <created>1768869374347</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1768869374347</updated>
+    </task>
+    <task id="LOCAL-00021" summary="feat: ui 设计">
+      <option name="closed" value="true" />
+      <created>1769217898777</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1769217898777</updated>
+    </task>
+    <task id="LOCAL-00022" summary="feat: ui 设计">
+      <option name="closed" value="true" />
+      <created>1769217935410</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1769217935410</updated>
+    </task>
+    <task id="LOCAL-00023" summary="feat: ui 设计">
+      <option name="closed" value="true" />
+      <created>1769219046707</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1769219046707</updated>
+    </task>
+    <task id="LOCAL-00024" summary="feat: ui 设计">
+      <option name="closed" value="true" />
+      <created>1769219320803</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1769219320803</updated>
+    </task>
+    <task id="LOCAL-00025" summary="feat: ui 设计">
+      <option name="closed" value="true" />
+      <created>1769220562261</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1769220562261</updated>
+    </task>
+    <task id="LOCAL-00026" summary="feat: 第2-19节：会话服务接口对接-ui">
+      <option name="closed" value="true" />
+      <created>1769225382544</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1769225382544</updated>
+    </task>
+    <task id="LOCAL-00027" summary="feat: ignore">
+      <option name="closed" value="true" />
+      <created>1769225502073</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1769225502073</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="2-1-init-project" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: init project" />
+    <MESSAGE value="feat: 第2-1节：工程初始化创建" />
+    <MESSAGE value="feat: 第2-2节：Api功能测试" />
+    <MESSAGE value="feat: 第2-3节：智能体配置表设计" />
+    <MESSAGE value="feat: 第2-4节：装配域结构化定义" />
+    <MESSAGE value="feat: 第2-5节：装配域节点-AiApiNode" />
+    <MESSAGE value="feat: 第2-6节：装配域节点-ChatModelNode" />
+    <MESSAGE value="feat: 第2-7节：装配域节点-AgentNode" />
+    <MESSAGE value="feat: 第2-8节：装配域节点-AgentWorkflowNode" />
+    <MESSAGE value="feat: 第2-9节：装配域节点-Loop、Parallel、Sequential" />
+    <MESSAGE value="feat: 第2-10节：装配域节点-RunnerNode" />
+    <MESSAGE value="feat: 第2-11节：智能体加载使用验证" />
+    <MESSAGE value="feat: 第2-12节：增强装配-RunnerNode" />
+    <MESSAGE value="feat: 第2-13：增强装配-AgentWorkflowNode" />
+    <MESSAGE value="feat: 第2-14节：增强装配-本地mcp" />
+    <MESSAGE value="feat: 第2-15节：增强装配-回调plugin" />
+    <MESSAGE value="feat: 第2-16节：fix-多模态能力使用" />
+    <MESSAGE value="feat: 第2-17节：会话服务接口实现-service" />
+    <MESSAGE value="feat: 第2-18节：会话服务接口实现-trigger" />
+    <MESSAGE value="feat: ui 设计" />
+    <MESSAGE value="feat: 第2-19节：会话服务接口对接-ui" />
+    <MESSAGE value="feat: ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: ignore" />
+  </component>
+</project>
