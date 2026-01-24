@@ -3,9 +3,9 @@ version: '3.8'
 # docker-compose -f docker-compose-app.yml up -d
 # 你需要修改system为你自身系统的仓库名
 services:
-  ai-agent-scaffold-lite:
-    image: system/ai-agent-scaffold-lite:1.0
-    container_name: ai-agent-scaffold-lite
+  ${artifactId}:
+    image: system/${artifactId}:${version}
+    container_name: ${artifactId}
     restart: on-failure
     ports:
       - "8091:8091"

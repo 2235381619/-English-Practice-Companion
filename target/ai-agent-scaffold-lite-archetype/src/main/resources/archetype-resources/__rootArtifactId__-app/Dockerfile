@@ -12,6 +12,7 @@ ENV TZ=PRC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 添加应用
-ADD target/ai-agent-scaffold-lite-app.jar /ai-agent-scaffold-lite-app.jar
+ADD target/${artifactId}.jar /${artifactId}.jar
 
-ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /ai-agent-scaffold-lite-app.jar $PARAMS"]
+## 在镜像运行为容器后执行的命令
+ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /${artifactId}.jar $PARAMS"]
