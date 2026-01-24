@@ -40,3 +40,4 @@ build/
 /.idea/
 /data/
 /ai-agent-scaffold-lite-app/data/
+/.trae/
