@@ -465,7 +465,7 @@
           <div class="brand">
             <div class="brand-badge" aria-hidden="true">AI</div>
             <div class="brand-title">
-              <strong>AI 智能体对话</strong>
+              <strong>AI 智能体对话 By Ai Agent Scaffold - @小傅哥</strong>
               <span id="apiHint">API: 未配置</span>
             </div>
           </div>
@@ -646,8 +646,8 @@
         const msg = reason && reason.message ? String(reason.message) : String(reason || "");
         const curl = `curl -s ${apiBase}/api/v1/query_ai_agent_config_list`;
         dom.backendDesc.textContent =
-          "当前页面需要访问服务端接口。请先启动服务端（确认 8091 端口与跨域配置正常），然后点击“重试”。";
-        dom.backendCode.textContent = `API_BASE: ${apiBase}\n${curl}${msg ? `\n\n错误：${msg}` : ""}`;
+          "当前页面需要访问服务端接口。请先启动服务端，然后点击“重试”。如果服务端已启动但仍不可用，请检查是否更换了服务端地址（可在工程内 docs/dev-ops/nginx/html/js/config.js 配置 API_BASE）。";
+        dom.backendCode.textContent = `配置文件：docs/dev-ops/nginx/html/js/config.js\nAPI_BASE: ${apiBase}\n${curl}${msg ? `\n\n错误：${msg}` : ""}`;
         setBackendModalVisible(true);
       }
 
