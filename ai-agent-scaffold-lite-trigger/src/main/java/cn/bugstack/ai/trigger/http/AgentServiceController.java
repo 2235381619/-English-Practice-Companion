@@ -66,7 +66,7 @@ public class AgentServiceController implements IAgentService {
         }
     }
 
-    @RequestMapping(value = "create_session", method = RequestMethod.GET)
+    @RequestMapping(value = "create_session", method = RequestMethod.POST)
     @Override
     public Response<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO requestDTO) {
         try {
@@ -94,6 +94,14 @@ public class AgentServiceController implements IAgentService {
                     .info(ResponseCode.UN_ERROR.getInfo())
                     .build();
         }
+    }
+
+    @RequestMapping(value = "create_session", method = RequestMethod.GET)
+    public Response<CreateSessionResponseDTO> createSession(@RequestParam("agentId") String agentId, @RequestParam("userId") String userId) {
+        CreateSessionRequestDTO requestDTO = new CreateSessionRequestDTO();
+        requestDTO.setAgentId(agentId);
+        requestDTO.setUserId(userId);
+        return createSession(requestDTO);
     }
 
     @RequestMapping(value = "chat", method = RequestMethod.POST)

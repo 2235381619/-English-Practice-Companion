@@ -485,7 +485,7 @@
         if (!raw) return;
         const payload = safeParseJson(raw);
         if (!payload || !payload.user) return;
-        showLoggedIn(payload);
+        window.location.replace("./index.html");
       }
 
       dom.fillDemo.addEventListener("click", () => {
@@ -520,8 +520,8 @@
 
         const payload = { user: username, ts: Date.now() };
         setCookie(COOKIE_NAME, JSON.stringify(payload), COOKIE_DAYS);
-        setMessage("登录成功，已保存 cookie。", "info");
-        showLoggedIn(payload);
+        setMessage("登录成功，正在跳转…", "info");
+        window.location.replace("./index.html");
       });
 
       bootFromCookie();
