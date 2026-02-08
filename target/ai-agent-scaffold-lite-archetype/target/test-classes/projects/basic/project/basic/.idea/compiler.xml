@@ -1,0 +1,30 @@
+<?xml version="0.1-SNAPSHOT" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="basic-domain" />
+        <module name="basic-types" />
+        <module name="basic-api" />
+        <module name="basic-app" />
+        <module name="basic-infrastructure" />
+        <module name="basic-trigger" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="basic" options="-parameters" />
+      <module name="basic-api" options="-parameters" />
+      <module name="basic-app" options="-parameters" />
+      <module name="basic-domain" options="-parameters" />
+      <module name="basic-infrastructure" options="-parameters" />
+      <module name="basic-trigger" options="-parameters" />
+      <module name="basic-types" options="-parameters" />
+    </option>
+  </component>
+</project>
