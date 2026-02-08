@@ -1,4 +1,4 @@
-package cn.bugstack.ai.test.api.tool;
+package cn.bugstack.ai.test.api.tool.mcp;
 
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
