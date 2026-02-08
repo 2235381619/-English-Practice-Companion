@@ -6,6 +6,7 @@
     <fileSet filtered="true" encoding="UTF-8">
       <directory>docs/dev-ops</directory>
       <includes>
+        <include>**/*.txt</include>
         <include>**/*.xml</include>
         <include>**/*.html</include>
       </includes>
@@ -33,7 +34,9 @@
       <includes>
         <include>**/*.sh</include>
         <include>**/*.svg</include>
+        <include>**/*.md</include>
         <include>**/*.yml</include>
+        <include>**/*.py</include>
         <include>**/*.js</include>
         <include>**/*.sql</include>
       </includes>
@@ -92,14 +95,18 @@
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
+            <include>**/*.txt</include>
             <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
+            <include>**/*.sh</include>
+            <include>**/*.md</include>
             <include>**/*.png</include>
             <include>**/*.yml</include>
+            <include>**/*.py</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">

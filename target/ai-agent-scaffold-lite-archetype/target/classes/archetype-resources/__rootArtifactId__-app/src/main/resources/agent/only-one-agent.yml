@@ -11,7 +11,7 @@ ai:
           module:
             ai-api:
               base-url: https://apis.itedus.cn
-              api-key: sk-NngHivTkdq3qYkApE285C3D44688453f9f7eDe35244741Df
+              api-key: sk-fmiyy7T5MNlCVV059d07Af9194C041EfA8F137B4A86c6189
               completions-path: v1/chat/completions
               embeddings-path: v1/embeddings
             chat-model:
@@ -20,10 +20,16 @@ ai:
                 - sse:
                     name: baidu-search
                     base-uri: http://appbuilder.baidu.com/v2/ai_search/mcp/
-                    sse-endpoint: sse?api_key=bce-v3/ALTAK-3zODLb9qHozIftQlGwez5/2696e92781f5bf1ba1870e2958f239fd6dc822a4
+                    sse-endpoint: sse?api_key=bce-v3/ALTAK-WjK8NIh3txZo7rXXEjhri/e2f09d53de961bcaf2609b76c7c7a7e6d0f05da3
                     request-timeout: 500000
                 - local:
                     name: myToolCallbackProvider
+              tool-skills-list:
+                - type: resource
+                  path: agent/skills
+
+#                - type: directory
+#                  path: /Users/fuzhengwei/coding/gitcode/KnowledgePlanet/ai-agent-scaffold/ai-agent-scaffold-lite/docs/dev-ops/agent/skills
             agents:
               - name: onlyAgent
                 description: 小傅哥学习项目计划

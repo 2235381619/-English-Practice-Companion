@@ -49,6 +49,8 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.3</version>
+        <!-- 可配置 ai 2.0.0-M2 升级 + skills spring-ai-agent-utils 升级使用 -->
+    <!--<version>4.1.0-M1</version>-->
     </parent>
 
     <dependencyManagement>
@@ -158,6 +160,28 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- 可升级配置使用 -->
+            <!--<dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-openai</artifactId>
+                <version>2.0.0-M2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-model</artifactId>
+                <version>2.0.0-M2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-mcp</artifactId>
+                <version>2.0.0-M2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
+                <version>2.0.0-M2</version>
+            </dependency>-->
+
             <!-- langchain4j https://mvnrepository.com/artifact/dev.langchain4j/langchain4j-bom -->
             <dependency>
                 <groupId>dev.langchain4j</groupId>
@@ -165,6 +189,13 @@
                 <version>1.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- https://github.com/spring-ai-community/spring-ai-agent-utils -->
+            <dependency>
+                <groupId>org.springaicommunity</groupId>
+                <artifactId>spring-ai-agent-utils</artifactId>
+                <version>0.4.2</version>
             </dependency>
 
             <!-- 设计模式框架 -->
