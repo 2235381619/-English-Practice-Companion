@@ -40,3 +40,5 @@ build/
 /data/
 /ai-agent-scaffold-lite-app/data/
 /.trae/
+/ai-agent-scaffold-lite-app/target/
+/ai-agent-scaffold-lite-domain/target/
