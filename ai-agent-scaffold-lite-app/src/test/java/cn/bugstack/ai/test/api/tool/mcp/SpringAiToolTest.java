@@ -53,7 +53,7 @@ public class SpringAiToolTest {
      */
     public static McpSyncClient sseMcpClient() {
 
-        // 自己申请 api_key
+        // 自己申请 api_key http://appbuilder.baidu.com/v2/ai_search/mcp/sse?api_key=bce-v3/ALTAK-qNn3nYsYuAJzyIfGN6k9X/382f13b7e2ffc837ef987d54d755ee0c7f78fa0e
         HttpClientSseClientTransport sseClientTransport = HttpClientSseClientTransport.builder("http://appbuilder.baidu.com")
                 .sseEndpoint("/v2/ai_search/mcp/sse?api_key=bce-v3/ALTAK-JFZXXLpfxhAutDQvJ32Ei/4492c1879b8c2f0df4612ef5b4a52df1c1fba9f7")
                 .build();
