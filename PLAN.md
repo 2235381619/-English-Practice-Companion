@@ -1,4 +1,4 @@
-﻿# AI English Practice Companion — 开发计划
+# AI English Practice Companion — 开发计划
 
 ## 项目概述
 
@@ -52,25 +52,27 @@ ai-agent-scaffold-lite/
 │       ├── PracticeController.java       ← API 接口定义
 │       └── dto/                           ← 请求/响应对象
 │
-├── ai-agent-scaffold-lite-domain/        # 领域层
-│   └── src/main/java/cn/bugstack/ai/domain/practice/
-│       ├── model/
-│       │   ├── entity/                   ← PracticeSession, ConversationRound
-│       │   └── valobj/                   ← Scenario, EvaluationResult, SessionReport
-│       ├── service/
-│       │   ├── IPracticeService.java     ← 练习总入口接口
-│       │   └── impl/
-│       │       ├── PracticeServiceImpl.java  ← 编排 Audio/Evaluation/TTS Service
-│       │       ├── AudioService.java         ← VAD + ASR 管线
-│       │       ├── EvaluationService.java    ← GPT 评测
-│       │       └── TtsService.java           ← edge-tts 合成
-│       ├── agent/
-│       │   └── EvaluatorAgent.java       ← ADK 装配，纯 LLM 评估
-│       └── adapter/
-│           ├── IAudioRepository.java     ← 音频文件存储接口
-│           └── ISessionRepository.java   ← 会话持久化接口
-│
-├── ai-agent-scaffold-lite-trigger/       # 触发层
+├── ai-agent-scaffold-lite-domain/        # 领域层 — 纯功能实现
+  │   └── src/main/java/cn/bugstack/ai/domain/practice/
+  │       ├── model/
+  │       │   ├── entity/                   ← PracticeSession, ConversationRound
+  │       │   └── valobj/                   ← Scenario, EvaluationResult, SessionReport
+  │       ├── service/impl/
+  │       │   ├── AudioService.java         ← VAD + ASR（纯功能）
+  │       │   ├── EvaluationService.java    ← GPT 评测（纯功能）
+  │       │   └── TtsService.java           ← edge-tts 合成（纯功能）
+  │       ├── agent/
+  │       │   └── EvaluatorAgent.java       ← 评测 Agent 接口
+  │       └── adapter/
+  │           ├── IAudioRepository.java     ← 音频存储接口
+  │           └── ISessionRepository.java   ← 会话持久化接口
+  │
+  ├── ai-agent-scaffold-lite-case/          # 用例层 — 业务编排
+  │   └── src/main/java/cn/bugstack/ai/usecase/practice/
+  │       ├── IPracticeService.java         ← 练习总入口接口
+  │       └── PracticeServiceImpl.java      ← 编排 Audio/Evaluation/TTS + 会话管理
+  │
+  ├── ai-agent-scaffold-lite-trigger/       # 触发层
 │   └── src/main/java/cn/bugstack/ai/trigger/
 │       ├── http/PracticeController.java  ← REST 接口
 │       └── listener/PracticeWebSocket.java ← WebSocket 音频流
@@ -106,23 +108,23 @@ ai-agent-scaffold-lite/
 
 - [x] ~~初始化项目结构~~（脚手架已有，需整理）
 - [x] ~~设计整体架构~~（已完成）
-- [ ] **创建 domain/practice 包**
-  - [ ] `model/entity/PracticeSession.java`
-  - [ ] `model/entity/ConversationRound.java`
-  - [ ] `model/valobj/Scenario.java`（枚举：INTERVIEW / RESTAURANT / MEETING）
-  - [ ] `model/valobj/EvaluationResult.java`（纠错 + 表达建议 + 评分）
-  - [ ] `model/valobj/SessionReport.java`（课后总结报告）
-- [ ] **创建 domain/practice/service**
-  - [ ] `IPracticeService.java` 接口
-  - [ ] `PracticeServiceImpl.java` — 编排主流程
-  - [ ] `AudioService.java` — VAD + ASR（当前在 Demo 里，搬到 domain）
-  - [ ] `EvaluationService.java` — GPT 评测（当前在 Demo 里，搬到 domain）
-  - [ ] `TtsService.java` — edge-tts 后台引擎（当前在 Demo 里，搬到 domain）
-- [ ] **创建 domain/practice/agent**
-  - [ ] `EvaluatorAgent.java` — ADK 装配的 LLM 评估 Agent
-- [ ] **创建 domain/practice/adapter**
-  - [ ] `IAudioRepository.java`
-  - [ ] `ISessionRepository.java`
+- [x] **创建 domain/practice 包**
+  - [x] `model/entity/PracticeSession.java`
+  - [x] `model/entity/ConversationRound.java`
+  - [x] `model/valobj/Scenario.java`（枚举：INTERVIEW / RESTAURANT / MEETING）
+  - [x] `model/valobj/EvaluationResult.java`（纠错 + 表达建议 + 评分）
+  - [x] `model/valobj/SessionReport.java`（课后总结报告）
+- [x] **创建 domain/practice/service**
+  - [x] `IPracticeService.java` 接口
+  - [x] `PracticeServiceImpl.java` — 编排主流程
+  - [x] `AudioService.java` — VAD + ASR（当前在 Demo 里，搬到 domain）
+  - [x] `EvaluationService.java` — GPT 评测（当前在 Demo 里，搬到 domain）
+  - [x] `TtsService.java` — edge-tts 后台引擎（当前在 Demo 里，搬到 domain）
+- [x] **创建 domain/practice/agent**
+  - [x] `EvaluatorAgent.java` — ADK 装配的 LLM 评估 Agent
+- [x] **创建 domain/practice/adapter**
+  - [x] `IAudioRepository.java`
+  - [x] `ISessionRepository.java`
 
 #### Phase 2: API + Trigger 层
 
@@ -197,3 +199,5 @@ mvn test -Dtest=EnglishTutorDemo -DfailIfNoTests=false
 5. 核心待办：创建 `domain/practice/` 包，迁移 Demo 逻辑到正规 Service
 6. 架构文档：本文档
 7. 同传相关代码可忽略（`SegmentBuffer`, `TranslationSession`, `TranslationServiceImpl` 等）
+
+

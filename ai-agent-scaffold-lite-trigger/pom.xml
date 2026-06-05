@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>cn.bugstack.ai</groupId>
-            <artifactId>ai-agent-scaffold-lite-domain</artifactId>
+            <artifactId>ai-agent-scaffold-lite-case</artifactId>
         </dependency>
     </dependencies>
 
