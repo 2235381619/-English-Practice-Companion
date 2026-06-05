@@ -2,6 +2,7 @@ package cn.bugstack.ai.domain.practice.service.impl;
 
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
+import cn.bugstack.ai.domain.practice.service.IEvaluationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class EvaluationService {
+public class EvaluationService implements IEvaluationService {
 
     private static final String EVAL_TEMPLATE = """
             You are an English tutor. Evaluate the user's speech in this scenario:
@@ -53,6 +54,7 @@ public class EvaluationService {
     }
 
     public EvaluationResult evaluate(String userText, Scenario scenario, String history) {
+        log.info("GPT evaluate request: {}", userText);
         try {
             Map<String, Object> vars = Map.of(
                     "scenarioPrompt", scenario.getSystemPrompt(),

@@ -1,4 +1,4 @@
-﻿# AI English Practice Companion — 开发计划
+# AI English Practice Companion — 开发计划
 
 ## 项目概述
 
@@ -85,7 +85,7 @@ ai-agent-scaffold-lite/
 ├── ai-agent-scaffold-lite-app/           # 应用层
 │   └── src/main/resources/agent/practice-agent.yml  ← Agent 装配配置
 │
-└── ai-agent-scaffold-lite-frontend/      # Vue 3 前端
+└── docs/nginx/      # Vue 3 前端
     └── src/
         ├── views/PracticeView.vue        ← 练习主页面
         ├── components/                   ← 场景选择、对话、评测组件
@@ -199,6 +199,8 @@ mvn test -Dtest=EnglishTutorDemo -DfailIfNoTests=false
 5. 核心待办：创建 `domain/practice/` 包，迁移 Demo 逻辑到正规 Service
 6. 架构文档：本文档
 7. 同传相关代码可忽略（`SegmentBuffer`, `TranslationSession`, `TranslationServiceImpl` 等）
+
+
 
 
 

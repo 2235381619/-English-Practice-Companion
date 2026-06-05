@@ -6,9 +6,9 @@ import cn.bugstack.ai.domain.practice.model.entity.PracticeSession;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.domain.practice.model.valobj.SessionReport;
-import cn.bugstack.ai.domain.practice.service.impl.AudioService;
-import cn.bugstack.ai.domain.practice.service.impl.EvaluationService;
-import cn.bugstack.ai.domain.practice.service.impl.TtsService;
+import cn.bugstack.ai.domain.practice.service.IAliyunAsrService;
+import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import cn.bugstack.ai.domain.practice.service.ITtsService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,24 +16,28 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 口语练习用例编排 — 用例层实现
  *
- * 串联 AudioService → EvaluationService → TtsService，
+ * 串联 IAudioService → IEvaluationService → ITtsService，
  * 管理 PracticeSession 生命周期。
  */
 @Slf4j
 public class PracticeServiceImpl implements IPracticeService {
 
-    private final AudioService audioService;
-    private final EvaluationService evaluationService;
-    private final TtsService ttsService;
+    //private final IAudioService audioService;
+    private final IAliyunAsrService aliyunAsrService;
+    private final IEvaluationService evaluationService;
+    private final ITtsService ttsService;
     private final ISessionRepository sessionRepository;
 
     private final ConcurrentHashMap<String, PracticeSession> sessions = new ConcurrentHashMap<>();
 
-    public PracticeServiceImpl(AudioService audioService,
-                                EvaluationService evaluationService,
-                                TtsService ttsService,
+    public PracticeServiceImpl(
+                                //IAudioService audioService,
+                                IAliyunAsrService aliyunAsrService,
+                                IEvaluationService evaluationService,
+                                ITtsService ttsService,
                                 ISessionRepository sessionRepository) {
-        this.audioService = audioService;
+        //this.audioService = audioService;
+        this.aliyunAsrService = aliyunAsrService;
         this.evaluationService = evaluationService;
         this.ttsService = ttsService;
         this.sessionRepository = sessionRepository;
@@ -66,7 +70,13 @@ public class PracticeServiceImpl implements IPracticeService {
             throw new IllegalStateException("Session not found or inactive: " + sessionId);
         }
 
-        String text = audioService.transcribeFromPcm(audioData, 16000);
+        String text;
+        try {
+            text = aliyunAsrService.transcribe(audioData, "webm");
+        } catch (Exception e) {
+            log.warn("ASR failed: {}", e.getMessage());
+            text = null;
+        }
         if (text == null || text.isBlank()) {
             log.info("No speech detected in audio for session {}", sessionId);
             return EvaluationResult.builder()

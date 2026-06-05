@@ -1,4 +1,4 @@
-﻿server:
+server:
   port: 8091
 
 # 线程池配置
@@ -16,12 +16,12 @@ thread:
 spring:
   config:
     import:
-      - classpath:agent/only-one-agent.yml
+#      - classpath:agent/only-one-agent.yml
       - classpath:agent/practice-agent.yml
   datasource:
     username: root
     password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/xfg_frame_archetype?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=true
+    url: jdbc:mysql://127.0.0.1:13306/xfg_frame_archetype?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
   hikari:
     pool-name: Retail_HikariCP
@@ -35,8 +35,8 @@ spring:
   type: com.zaxxer.hikari.HikariDataSource
   ai:
     openai:
-      api-key: sk-BPQbnWSOzxEjOxg9627aFfD87aC44b238eC99c0c992dDd94
-      base-url: https://apis.itedus.cn
+      api-key: sk-7ecbf63d8c7f48489e820f22abbc9d3a
+      base-url: https://api.deepseek.com
 
 # MyBatis 配置【如需使用记得打开】
 #mybatis:
@@ -53,10 +53,17 @@ logging:
 practice:
   asr:
     base-url: https://apis.itedus.cn
-    api-key: sk-BPQbnWSOzxEjOxg9627aFfD87aC44b238eC99c0c992dDd94
+    api-key: YOUR_OPENAI_API_KEY
+    nls:
+      app-key: YOUR_NLS_APP_KEY
+      access-key-id: YOUR_ALIYUN_AK_ID
+      access-key-secret: YOUR_ALIYUN_AK_SECRET
+      gateway-url: wss://nls-gateway-cn-shanghai.aliyuncs.com/ws/v1
   tts:
     python-path: C:\Users\kqj\AppData\Local\Programs\Python\Python312\python.exe
     ffplay-path: C:\ffmpge\bin\ffplay.exe
     voice: en-US-JennyNeural
+
+
 
 

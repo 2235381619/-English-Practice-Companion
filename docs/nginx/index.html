@@ -8,94 +8,135 @@
 </head>
 <body>
   <div id="app" class="chat-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <div class="nav-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <path d="M12 6v6l4 2"/>
           </svg>
           <span>AI Agents</span>
         </div>
       </div>
-
-      <div class="sidebar-section-label">智能体列表</div>
-      <div class="agent-list" id="agentList"></div>
-
-      <div class="sidebar-footer">
-        <div class="user-badge">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          <span id="userId"></span>
-        </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-mode="chat" onclick="switchMode('chat')">💬 Chat</button>
+        <button class="nav-tab" data-mode="practice" onclick="switchMode('practice')">🎯 Practice</button>
       </div>
-    </aside>
+      <div class="nav-right"></div>
+    </nav>
 
-    <!-- Main Chat Area -->
-    <main class="main-area">
-      <!-- Header -->
-      <header class="chat-header">
-        <div class="chat-header-left">
-          <h1 class="chat-title" id="chatTitle">AI Agent 智能体交互平台</h1>
-          <span class="chat-subtitle" id="chatSubtitle"></span>
-        </div>
-        <div class="chat-header-right">
-          <div class="connection-status" id="connectionStatus">
-            <span class="status-dot"></span>
-            <span>未连接</span>
+    <!-- ===== Chat Mode ===== -->
+    <div id="chatMode" class="mode-panel">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section-label">智能体列表</div>
+        <div class="agent-list" id="agentList"></div>
+        <div class="sidebar-footer">
+          <div class="user-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="userId"></span>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <!-- Messages -->
-      <div class="messages-area" id="messagesArea">
-        <!-- Empty state (shown/hidden via JS) -->
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
+      <!-- Main Chat Area -->
+      <main class="main-area">
+        <header class="chat-header">
+          <div class="chat-header-left">
+            <h1 class="chat-title" id="chatTitle">AI Agent 智能体交互平台</h1>
+            <span class="chat-subtitle" id="chatSubtitle"></span>
           </div>
-          <h2 class="empty-title">开始对话</h2>
-          <p class="empty-desc" id="emptyDesc">从左侧选择一个智能体开始对话</p>
-          <div class="quick-agents" id="quickAgents"></div>
+          <div class="chat-header-right">
+            <div class="connection-status" id="connectionStatus">
+              <span class="status-dot"></span>
+              <span>未连接</span>
+            </div>
+          </div>
+        </header>
+        <div class="messages-area" id="messagesArea">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <h2 class="empty-title">开始对话</h2>
+            <p class="empty-desc" id="emptyDesc">从左侧选择一个智能体开始对话</p>
+            <div class="quick-agents" id="quickAgents"></div>
+          </div>
+          <div id="messageList"></div>
+          <div class="streaming-indicator hidden" id="streamingIndicator">
+            <div class="streaming-dot"></div><div class="streaming-dot"></div><div class="streaming-dot"></div>
+          </div>
+        </div>
+        <div class="input-area">
+          <div class="input-container" id="inputContainer">
+            <textarea id="chatInput" class="chat-textarea" placeholder="请先在左侧选择一个智能体..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== Practice Mode ===== -->
+    <div id="practiceMode" class="mode-panel" style="display:none;">
+      <main class="main-area practice-main">
+        <!-- Practice Header -->
+        <header class="practice-header">
+          <div class="practice-header-left">
+            <h1 class="practice-title" id="practiceTitle">English Speaking Practice</h1>
+            <span class="practice-scenario" id="practiceScenario"></span>
+          </div>
+          <div class="practice-header-right">
+            <button id="practiceEndBtn" class="practice-end-btn" style="display:none;" onclick="endPracticeSession()">End Session</button>
+          </div>
+        </header>
+
+        <!-- Scenario Selection -->
+        <div id="scenarioSelection" class="scenario-selection">
+          <div class="scenario-bg-glow"></div>
+          <h2 class="scenario-heading">Choose a Practice Scenario</h2>
+          <p class="scenario-subtitle">Pick a real-world scenario to practice your English conversation skills</p>
+          <div class="scenario-cards" id="scenarioCards"></div>
         </div>
 
-        <!-- Message list -->
-        <div id="messageList"></div>
-
-        <!-- Streaming indicator -->
-        <div class="streaming-indicator hidden" id="streamingIndicator">
-          <div class="streaming-dot"></div>
-          <div class="streaming-dot"></div>
-          <div class="streaming-dot"></div>
+        <!-- Practice Session (hidden until scenario selected) -->
+        <div id="practiceSession" class="practice-session-content" style="display:none;">
+          <div class="practice-body">
+            <!-- Conversation area -->
+            <div class="practice-conversation" id="practiceConversation">
+              <div class="conversation-empty" id="conversationEmpty">
+                <p>Start speaking or type your first message</p>
+              </div>
+              <div id="practiceMessageList"></div>
+              <div class="streaming-indicator hidden" id="practiceStreaming">
+                <div class="streaming-dot"></div><div class="streaming-dot"></div><div class="streaming-dot"></div>
+              </div>
+            </div>
+            <!-- Evaluation panel -->
+            <div class="evaluation-panel" id="evaluationPanel" style="display:none;"></div>
+          </div>
         </div>
-      </div>
 
-      <!-- Input -->
-      <div class="input-area">
-        <div class="input-container" id="inputContainer">
-          <textarea
-            id="chatInput"
-            class="chat-textarea"
-            placeholder="请先在左侧选择一个智能体..."
-            rows="1"
-          ></textarea>
-          <button class="send-btn" id="sendBtn" disabled>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
+        <!-- Practice Input -->
+        <div id="practiceInput" class="practice-input-area" style="display:none;">
+          <div class="practice-input-row">
+            <input id="practiceTextInput" class="practice-text-input" placeholder="Type your message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPracticeText()}"/>
+            <button id="practiceMicBtn" class="practice-mic-btn" onclick="toggleConversation()" title="Start recording">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            </button>
+            <button class="practice-send-btn" onclick="sendPracticeText()" id="practiceSendBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <script src="app.js"></script>
+  <script src="practice.js"></script>
 </body>
 </html>
+

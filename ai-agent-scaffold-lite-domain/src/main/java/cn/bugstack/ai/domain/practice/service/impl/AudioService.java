@@ -1,5 +1,6 @@
 package cn.bugstack.ai.domain.practice.service.impl;
 
+import cn.bugstack.ai.domain.practice.service.IAudioService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
@@ -19,7 +20,7 @@ import java.io.*;
  */
 @Slf4j
 @Service
-public class AudioService {
+public class AudioService implements IAudioService {
 
     public static final double VAD_THRESHOLD = 800.0;
     public static final int SILENCE_LIMIT = 40;
@@ -33,6 +34,7 @@ public class AudioService {
     }
 
     public String transcribe(File wavFile) {
+        log.info("ASR transcribe request: {}", wavFile.getName());
         try {
             var opts = OpenAiAudioTranscriptionOptions.builder()
                     .model("whisper-1").language("en")
@@ -55,6 +57,24 @@ public class AudioService {
             return text;
         } catch (Exception e) {
             log.warn("ASR from PCM failed: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将任意格式的音频 bytes 写入临时文件后转写
+     */
+    public String transcribeFromBytes(byte[] audioData, String extension) {
+        try {
+            File tmp = File.createTempFile("practice_", "." + extension);
+            try (FileOutputStream fos = new FileOutputStream(tmp)) {
+                fos.write(audioData);
+            }
+            String text = transcribe(tmp);
+            if (!tmp.delete()) log.warn("Temp file delete failed");
+            return text;
+        } catch (Exception e) {
+            log.warn("ASR from bytes failed: {}", e.getMessage());
             return null;
         }
     }
