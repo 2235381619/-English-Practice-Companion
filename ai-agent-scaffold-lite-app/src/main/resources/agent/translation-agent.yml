@@ -1,0 +1,40 @@
+﻿# ===== Agent 系统配置（armory 读取）=====
+ai:
+  agent:
+    config:
+      tables:
+        translateAgent:
+          app-name: translateAgent
+          agent:
+            agent-id: "999001"
+            agent-name: "\u540C\u58F0\u4F20\u8BD1"
+            agent-desc: "AI\u5B9E\u65F6\u97F3\u9891\u7FFB\u8BD1\u5F15\u64CE"
+          module:
+            ai-api:
+              base-url: https://apis.itedus.cn
+              api-key: sk-Sp2jx3yeq7x7HJ663bDc9bF0D34b4f609f833840271519B1
+              completions-path: v1/chat/completions
+            chat-model:
+              model: gpt-4o-mini
+            agents:
+              - name: TranslatorAgent
+                description: "Translates speech text to Chinese"
+                instruction: |
+                  You are a professional simultaneous interpreter.
+                  Translate the following text into Chinese.
+                  Rules:
+                  1. Maintain the speaker'\''s tone and style
+                  2. Keep technical terms accurate
+                  3. Output ONLY the translation, no explanations
+                output-key: translation
+            runner:
+              agent-name: TranslatorAgent
+
+# ===== 翻译系统配置（TranslateProperties 读取）=====
+translate:
+  ai:
+    base-url: https://apis.itedus.cn
+    api-key: sk-Sp2jx3yeq7x7HJ663bDc9bF0D34b4f609f833840271519B1
+    completions-path: v1/chat/completions
+    transcription-model: whisper-1
+    chat-model: gpt-4o-mini
