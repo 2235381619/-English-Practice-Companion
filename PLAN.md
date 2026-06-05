@@ -128,19 +128,19 @@ ai-agent-scaffold-lite/
 
 #### Phase 2: API + Trigger 层
 
-- [ ] **api 层**
-  - [ ] `api/practice/dto/CreateSessionRequest.java`
-  - [ ] `api/practice/dto/CreateSessionResponse.java`
-  - [ ] `api/practice/dto/SubmitAudioResponse.java`
-  - [ ] `api/practice/dto/SessionReportResponse.java`
-  - [ ] `api/practice/dto/ScenarioListResponse.java`
-- [ ] **trigger 层**
-  - [ ] `trigger/http/PracticeController.java` — REST: `POST /session`, `GET /session/{id}`, `GET /scenarios`
-  - [ ] `trigger/listener/PracticeWebSocket.java` — WebSocket: 音频流对接
-- [ ] **Agent YAML 配置**
-  - [ ] `app/src/main/resources/agent/practice-agent.yml`
-  - [ ] `app/src/main/resources/application-dev.yml` 引入 practice-agent.yml
-  - [ ] 添加 ASR 和 TTS 配置到 application.yml
+- [x] **api 层**
+  - [x] `api/practice/dto/CreateSessionRequest.java`
+  - [x] `api/practice/dto/CreateSessionResponse.java`
+  - [x] `api/practice/dto/SubmitAudioResponse.java`
+  - [x] `api/practice/dto/SessionReportResponse.java`
+  - [x] `api/practice/dto/ScenarioListResponse.java`
+- [x] **trigger 层**
+  - [x] `trigger/http/PracticeController.java` — REST: `POST /session`, `GET /session/{id}`, `GET /scenarios`
+  - [x] `trigger/listener/PracticeWebSocket.java` — WebSocket: 音频流对接
+- [x] **Agent YAML 配置**
+  - [x] `app/src/main/resources/agent/practice-agent.yml`
+  - [x] `app/src/main/resources/application-dev.yml` 引入 practice-agent.yml
+  - [x] 添加 ASR 和 TTS 配置到 application.yml
 
 #### Phase 3: Infrastructure + 前端
 
@@ -199,5 +199,6 @@ mvn test -Dtest=EnglishTutorDemo -DfailIfNoTests=false
 5. 核心待办：创建 `domain/practice/` 包，迁移 Demo 逻辑到正规 Service
 6. 架构文档：本文档
 7. 同传相关代码可忽略（`SegmentBuffer`, `TranslationSession`, `TranslationServiceImpl` 等）
+
 
 

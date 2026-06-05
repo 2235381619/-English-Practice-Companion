@@ -1,4 +1,4 @@
-server:
+﻿server:
   port: 8091
 
 # 线程池配置
@@ -16,10 +16,8 @@ thread:
 spring:
   config:
     import:
-#      - classpath:agent/test-agent-02.yml
-#      - classpath:agent/test-agent.yml
       - classpath:agent/only-one-agent.yml
-#      - classpath:agent/parallel_research_app.yml
+      - classpath:agent/practice-agent.yml
   datasource:
     username: root
     password: 123456
@@ -56,3 +54,9 @@ practice:
   asr:
     base-url: https://apis.itedus.cn
     api-key: sk-BPQbnWSOzxEjOxg9627aFfD87aC44b238eC99c0c992dDd94
+  tts:
+    python-path: C:\Users\kqj\AppData\Local\Programs\Python\Python312\python.exe
+    ffplay-path: C:\ffmpge\bin\ffplay.exe
+    voice: en-US-JennyNeural
+
+

@@ -1,0 +1,27 @@
+ai:
+  agent:
+    config:
+      tables:
+        practiceEvaluator:
+          app-name: practiceEvaluator
+          agent:
+            agent-id: 200001
+            agent-name: 英语口语评测
+            agent-desc: AI 英语口语陪练评测引擎
+          module:
+            ai-api:
+              base-url: https://apis.itedus.cn
+              api-key: sk-BPQbnWSOzxEjOxg9627aFfD87aC44b238eC99c0c992dDd94
+              completions-path: v1/chat/completions
+            chat-model:
+              model: gpt-4o-mini
+          agents:
+            - name: englishTutor
+              description: AI English Tutor
+              instruction: |
+                You are an experienced English tutor. Evaluate the user's spoken English,
+                correct grammar mistakes, suggest better expressions, and continue the 
+                conversation naturally in the given scenario (interview / restaurant / meeting).
+                Be encouraging and focus on practical communication skills.
+          runner:
+            agent-name: englishTutor
