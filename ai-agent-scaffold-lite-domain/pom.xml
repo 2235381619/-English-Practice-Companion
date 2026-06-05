@@ -19,6 +19,10 @@
             <artifactId>spring-ai-openai</artifactId>
         </dependency>
         <dependency>
+            <groupId>cn.xfyun</groupId>
+            <artifactId>websdk-java-speech</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-mcp</artifactId>
         </dependency>
@@ -43,6 +47,10 @@
                 <artifactId>netty-all</artifactId>
             </exclusion>
         </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>cn.xfyun</groupId>
+            <artifactId>websdk-java-speech</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -75,6 +83,7 @@
     </build>
 
 </project>
+
 
 
 

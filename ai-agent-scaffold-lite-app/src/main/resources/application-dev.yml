@@ -63,6 +63,21 @@ practice:
     python-path: C:\Users\kqj\AppData\Local\Programs\Python\Python312\python.exe
     ffplay-path: C:\ffmpge\bin\ffplay.exe
     voice: en-US-JennyNeural
+  iflytek:
+    app-id: aa5f53e2         # 讯飞控制台 APPID
+    api-key: 10ed6197def1ffa8ca32e0ae10c5fc61   # 讯飞 APIKey（ASR/TTS 共用）
+    api-secret: NGIzMDgyM2RhMTg0NDFkN2MzNjVhNmQx  # 讯飞 APISecret
+    voice-name: amanda                 # TTS 发音人: xiaoyan, xiaofeng, catherine, amanda 等
+    speed: "50"
+    volume: "50"
+
+# 语音服务提供方配置
+voice:
+  asr:
+    provider: aliyun          # aliyun（默认） / iflytek
+  tts:
+    provider: edgetts         # edgetts（默认） / iflytek
+
 
 
 
