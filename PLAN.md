@@ -1,4 +1,4 @@
-# AI English Practice Companion — 开发计划
+﻿# AI English Practice Companion — 开发计划
 
 ## 项目概述
 
@@ -148,13 +148,13 @@ ai-agent-scaffold-lite/
   - [x] `PracticeSessionRepository.java`（文件JSON持久化）
   - [x] `AudioFileRepositoryImpl.java`（文件系统存储）
   - [x] MySQL 建表 SQL（practice_session + conversation_round）
-- [ ] **前端（Vue 3）**
-  - [ ] `PracticeView.vue` — 练习主页面
-  - [ ] `ScenarioSelector.vue` — 场景选择组件
-  - [ ] `ConversationPanel.vue` — 对话展示组件
-  - [ ] `EvaluationPanel.vue` — 评测结果组件
-  - [ ] `api/practice.js` — 前端 API 调用
-  - [ ] WebSocket 音频流对接
+- [x] **前端（Vue 3）**
+  - [x] `PracticeView.vue` — 练习主页面
+  - [x] `ScenarioSelector.vue` — 场景选择组件
+  - [x] `ConversationPanel.vue` — 对话展示组件
+  - [x] `EvaluationPanel.vue` — 评测结果组件
+  - [x] `api/practice.js` — 前端 API 调用
+  - [x] WebSocket 音频流对接（MediaRecorder → practice-agent）
 
 #### Phase 4: 功能打磨
 
@@ -199,6 +199,7 @@ mvn test -Dtest=EnglishTutorDemo -DfailIfNoTests=false
 5. 核心待办：创建 `domain/practice/` 包，迁移 Demo 逻辑到正规 Service
 6. 架构文档：本文档
 7. 同传相关代码可忽略（`SegmentBuffer`, `TranslationSession`, `TranslationServiceImpl` 等）
+
 
 
 
