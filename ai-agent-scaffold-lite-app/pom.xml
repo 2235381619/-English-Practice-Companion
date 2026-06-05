@@ -133,7 +133,7 @@
 
         <!-- spring ai & google adk end -->
 
-        <!-- 工程模块；启动依赖 trigger->domain, infrastructure-->
+        <!-- 工程模块；启动依�?trigger->domain, infrastructure-->
         <dependency>
             <groupId>cn.bugstack.ai</groupId>
             <artifactId>ai-agent-scaffold-lite-trigger</artifactId>
@@ -170,7 +170,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <!-- <skipTests>true</skipTests> -->
                     <testFailureIgnore>false</testFailureIgnore>
                     <includes>
                         <include>**/*Test.java</include>
