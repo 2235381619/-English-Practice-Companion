@@ -11,6 +11,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,6 +29,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
     private static final ConcurrentHashMap<String, ByteArrayOutputStream> audioBuffers = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> liveSessions = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> sessionScenarios = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, java.util.List<java.util.Map<String, Object>>> sessionRounds = new ConcurrentHashMap<>();
 
     private final DefaultPracticeFactory practiceFactory;
 
@@ -143,6 +145,14 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     // ── helpers ──
+
+    public static void saveRound(String sessionId, java.util.Map<String, Object> round) {
+        sessionRounds.computeIfAbsent(sessionId, k -> java.util.Collections.synchronizedList(new java.util.ArrayList<>())).add(round);
+    }
+
+    public static java.util.List<java.util.Map<String, Object>> getSessionRounds(String sessionId) {
+        return sessionRounds.get(sessionId);
+    }
 
     private String extractSessionId(WebSocketSession session) {
         URI uri = session.getUri();

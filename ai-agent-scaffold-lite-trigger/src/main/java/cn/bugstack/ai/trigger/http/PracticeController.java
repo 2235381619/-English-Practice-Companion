@@ -3,6 +3,9 @@ package cn.bugstack.ai.trigger.http;
 import cn.bugstack.ai.api.response.Response;
 import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
+import cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler;
+import java.util.List;
+import java.util.Map;
 import cn.bugstack.ai.types.enums.ResponseCode;
 import cn.bugstack.ai.usecase.practice.IPracticeService2;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,14 @@ public class PracticeController {
         try {
             request.setInputType(2);
             PracticeResult result = practiceService2.handleMessage(request);
+            java.util.Map<String, Object> round = new java.util.HashMap<>();
+            round.put("asrText", result.getAsrText());
+            round.put("replyText", result.getReplyText());
+            round.put("correctedText", result.getCorrectedText());
+            round.put("grammarIssues", result.getGrammarIssues());
+            round.put("suggestions", result.getSuggestions());
+            round.put("score", result.getScore());
+            PracticeAudioWebSocketHandler.saveRound(request.getSessionId(), round);
             log.info("Practice text: sessionId={}, asrText={}, reply={}",
                     request.getSessionId(), result.getAsrText(), result.getReplyText());
             return Response.<PracticeResult>builder()
@@ -55,6 +66,43 @@ public class PracticeController {
         } catch (Exception e) {
             log.error("Submit audio failed", e);
             return Response.<PracticeResult>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(e.getMessage())
+                    .build();
+        }
+    }
+}
+    @GetMapping("session/{sessionId}/report")
+    public Response<Map<String, Object>> getSessionReport(@PathVariable String sessionId) {
+        try {
+            var rounds = cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler.getSessionRounds(sessionId);
+            if (rounds == null || rounds.isEmpty()) {
+                return Response.<Map<String, Object>>builder()
+                        .code("0004").info("No data found").build();
+            }
+
+            double avgScore = rounds.stream()
+                    .mapToInt(r -> (int) r.getOrDefault("score", 0))
+                    .average().orElse(0);
+            long totalIssues = rounds.stream()
+                    .flatMap(r -> ((List<String>) r.getOrDefault("grammarIssues", List.of())).stream())
+                    .count();
+
+            Map<String, Object> report = new java.util.HashMap<>();
+            report.put("sessionId", sessionId);
+            report.put("totalRounds", rounds.size());
+            report.put("averageScore", Math.round(avgScore * 10) / 10.0);
+            report.put("totalGrammarIssues", totalIssues);
+            report.put("rounds", rounds);
+
+            return Response.<Map<String, Object>>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(report)
+                    .build();
+        } catch (Exception e) {
+            log.error("Get report failed", e);
+            return Response.<Map<String, Object>>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(e.getMessage())
                     .build();
