@@ -26,11 +26,10 @@ public class PracticeService2 implements IPracticeService2 {
 
         StrategyHandler<HandlePracticeMessageCommandEntity, DefaultPracticeFactory.DynamicContext, PracticeResult> handler =
                 defaultPracticeFactory.strategyHandler();
-        handler.apply(request, ctx);
+        PracticeResult result = handler.apply(request, ctx);
 
-        log.info("PracticeService2: asrText=\"{}\", replyText=\"{}\"", ctx.getAsrText(), ctx.getReplyText());
+        log.info("PracticeService2: asrText=\"{}\", replyText=\"{}\"", result.getAsrText(), result.getReplyText());
 
-        PracticeResult result = PracticeResult.fromContext(ctx);
         return result;
     }
 }

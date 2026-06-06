@@ -20,13 +20,21 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         // dynamicContext.setAudioUrl("/audio/" + requestParameter.getSessionId() + ".mp3");
         dynamicContext.setSuccess(true);
         log.info("TTSNode: done (placeholder), sessionId={}", requestParameter.getSessionId());
-        return router(requestParameter, dynamicContext);
+        return PracticeResult.builder()
+//                .asrText(dynamicContext.getAsrText())
+//                .replyText(dynamicContext.getReplyText())
+//                .correctedText(dynamicContext.getCorrectedText())
+//                .grammarIssues(dynamicContext.getGrammarIssues())
+//                .suggestions(dynamicContext.getSuggestions())
+//                .score(dynamicContext.getScore())
+//                .audioUrl(dynamicContext.getAudioUrl())
+                .build();
     }
 
     @Override
     public StrategyHandler<HandlePracticeMessageCommandEntity, DefaultPracticeFactory.DynamicContext, PracticeResult> get(
             HandlePracticeMessageCommandEntity requestParameter,
             DefaultPracticeFactory.DynamicContext dynamicContext) throws Exception {
-        return null;
+        return defaultStrategyHandler;
     }
 }

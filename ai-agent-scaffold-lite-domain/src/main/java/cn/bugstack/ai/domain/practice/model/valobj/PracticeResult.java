@@ -1,4 +1,5 @@
 package cn.bugstack.ai.domain.practice.model.valobj;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,9 +9,9 @@ import lombok.NoArgsConstructor;
  * 口语练习出参 — 树的最终输出
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class PracticeResult {
 
     /** ASR 识别文本 */
@@ -22,7 +23,10 @@ public class PracticeResult {
     /** TTS 音频 URL（预留） */
     private String audioUrl;
 
-    public static PracticeResult fromContext(PracticeDynamicContext ctx) {
-        return new PracticeResult(ctx.getAsrText(), ctx.getReplyText(), ctx.getAudioUrl());
-    }
+    /** LLM 建议 **/
+    private String suggestion;
+
+//    public static PracticeResult fromContext(PracticeDynamicContext ctx) {
+//        return new PracticeResult(ctx.getAsrText(), ctx.getReplyText(), ctx.getAudioUrl());
+//    }
 }

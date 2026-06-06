@@ -30,10 +30,10 @@ public class PracticeController {
             java.util.Map<String, Object> round = new java.util.HashMap<>();
             round.put("asrText", result.getAsrText());
             round.put("replyText", result.getReplyText());
-            round.put("correctedText", result.getCorrectedText());
-            round.put("grammarIssues", result.getGrammarIssues());
-            round.put("suggestions", result.getSuggestions());
-            round.put("score", result.getScore());
+//            round.put("correctedText", result.getCorrectedText());
+//            round.put("grammarIssues", result.getGrammarIssues());
+//            round.put("suggestions", result.getSuggestions());
+//            round.put("score", result.getScore());
             PracticeAudioWebSocketHandler.saveRound(request.getSessionId(), round);
             log.info("Practice text: sessionId={}, asrText={}, reply={}",
                     request.getSessionId(), result.getAsrText(), result.getReplyText());
@@ -71,9 +71,9 @@ public class PracticeController {
                     .build();
         }
     }
-}
+
     @GetMapping("session/{sessionId}/report")
-    public Response<Map<String, Object>> getSessionReport(@PathVariable String sessionId) {
+    public  Response<Map<String, Object>> getSessionReport(@PathVariable String sessionId) {
         try {
             var rounds = cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler.getSessionRounds(sessionId);
             if (rounds == null || rounds.isEmpty()) {

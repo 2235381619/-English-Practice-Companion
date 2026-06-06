@@ -1,118 +1,125 @@
 package cn.bugstack.ai.domain.practice.service.Tts;
 
 import cn.bugstack.ai.domain.practice.service.ITtsService;
+import cn.xfyun.api.TtsClient;
+import cn.xfyun.model.response.TtsResponse;
+import cn.xfyun.service.tts.AbstractTtsWebSocketListener;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
+import okhttp3.WebSocket;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * TTS 服务 — 常驻 edge-tts 引擎
+ * TTS 服务 — 讯飞 TtsClient (WebSocket 在线语音合成)
  *
- * 纯功能实现，属于 domain 层。
- * 维护长生命周期 Python edge-tts 子进程，通过 stdin/stdout 通信。
+ * 注入 IflytekConfiguration 中创建的 TtsClient 单例 Bean。
+ * 使用 CountDownLatch 将异步 WebSocket 响应转为同步返回。
  */
 @Slf4j
 @Service
 public class TtsService implements ITtsService {
 
-    private static final String DEFAULT_PYTHON = "C:\\Users\\kqj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe";
-    private static final String DEFAULT_FFPLAY = "C:\\ffmpge\\bin\\ffplay.exe";
-    private static final String DEFAULT_VOICE = "en-US-JennyNeural";
+    private static final long TIMEOUT_SECONDS = 60;
 
-    private final String pythonPath;
-    private final String ffplayPath;
-    private final String voice;
-    private final ExecutorService bg;
+    private final TtsClient ttsClient;
 
-    private Process proc;
-    private OutputStream stdin;
-    private volatile boolean running;
-
-    public TtsService() {
-        this(DEFAULT_PYTHON, DEFAULT_FFPLAY, DEFAULT_VOICE);
+    public TtsService(TtsClient ttsClient) {
+        this.ttsClient = ttsClient;
     }
 
-    public TtsService(String pythonPath, String ffplayPath, String voice) {
-        this.pythonPath = pythonPath;
-        this.ffplayPath = ffplayPath;
-        this.voice = voice;
-        this.bg = Executors.newCachedThreadPool();
-    }
+    @Override
+    public byte[] synthesize(String text) {
+        if (text == null || text.isBlank()) {
+            log.warn("Empty text for TTS");
+            return new byte[0];
+        }
 
-    public void start() throws IOException {
-        if (running) return;
-        String script = buildScript(voice);
-        proc = new ProcessBuilder(pythonPath, "-u", "-c", script).start();
-        stdin = proc.getOutputStream();
-        running = true;
-        log.info("TTS engine started (voice={})", voice);
-    }
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<byte[]> resultRef = new AtomicReference<>();
+        AtomicReference<String> errorRef = new AtomicReference<>();
 
-    public void speak(String text) {
-        if (!running) { log.warn("TTS engine not started"); return; }
-        bg.submit(() -> {
-            try {
-                stdin.write((text + "\n").getBytes("UTF-8"));
-                stdin.flush();
-                byte[] sizeBuf = new byte[4];
-                int read = proc.getInputStream().readNBytes(sizeBuf, 0, 4);
-                if (read < 4) return;
-                int size = ByteBuffer.wrap(sizeBuf).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                if (size <= 0 || size > 10_000_000) return;
-                byte[] mp3 = proc.getInputStream().readNBytes(size);
-                File tmp = File.createTempFile("tts_", ".mp3");
-                try (FileOutputStream fos = new FileOutputStream(tmp)) { fos.write(mp3); }
-                new ProcessBuilder(ffplayPath, "-nodisp", "-autoexit", "-loglevel", "quiet", tmp.getAbsolutePath())
-                        .start().waitFor();
-                if (!tmp.delete()) log.warn("Temp file delete failed");
-            } catch (Exception e) {
-                log.warn("TTS: {}", e.getMessage());
+        try {
+            ttsClient.send(text, new AbstractTtsWebSocketListener() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    resultRef.set(bytes);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onFail(WebSocket webSocket, Throwable t, Response response) {
+                    errorRef.set(t.getMessage());
+                    latch.countDown();
+                }
+
+                @Override
+                public void onBusinessFail(WebSocket webSocket, TtsResponse response) {
+                    errorRef.set("code=" + response.getCode() + " msg=" + response.getMessage());
+                    latch.countDown();
+                }
+            });
+
+            if (!latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                log.warn("TTS synthesize timeout ({}s) for text: {}", TIMEOUT_SECONDS, truncate(text));
+                return new byte[0];
             }
-        });
+        } catch (Exception e) {
+            log.error("TTS synthesize failed", e);
+            return new byte[0];
+        }
+
+        String err = errorRef.get();
+        if (err != null) {
+            log.error("TTS synthesize error: {}", err);
+            return new byte[0];
+        }
+
+        byte[] audio = resultRef.get();
+        if (audio == null || audio.length == 0) {
+            log.warn("TTS returned empty audio for text: {}", truncate(text));
+            return new byte[0];
+        }
+
+        log.info("TTS synthesized {} bytes for text: {}", audio.length, truncate(text));
+        return audio;
     }
 
-    public byte[] synthesize(String text) throws IOException {
-        if (!running) throw new IOException("TTS engine not started");
-        stdin.write((text + "\n").getBytes("UTF-8"));
-        stdin.flush();
-        byte[] sizeBuf = new byte[4];
-        int read = proc.getInputStream().readNBytes(sizeBuf, 0, 4);
-        if (read < 4) throw new IOException("TTS: insufficient header");
-        int size = ByteBuffer.wrap(sizeBuf).order(ByteOrder.LITTLE_ENDIAN).getInt();
-        if (size <= 0 || size > 10_000_000) throw new IOException("TTS: invalid size " + size);
-        return proc.getInputStream().readNBytes(size);
+    @Override
+    public File synthesize(String text, File outputFile) {
+        byte[] audio = synthesize(text);
+        if (audio.length == 0) {
+            return null;
+        }
+
+        try {
+            // 确保父目录存在
+            File parent = outputFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                fos.write(audio);
+                fos.flush();
+            }
+
+            log.info("TTS audio saved to file: {} ({} bytes)", outputFile.getAbsolutePath(), audio.length);
+            return outputFile;
+        } catch (IOException e) {
+            log.error("Failed to write TTS audio to file: {}", outputFile, e);
+            return null;
+        }
     }
 
-    public void stop() {
-        running = false;
-        if (proc != null) { proc.destroy(); proc = null; }
-        bg.shutdownNow();
-        log.info("TTS engine stopped");
-    }
-
-    public boolean isRunning() { return running; }
-
-    private static String buildScript(String voice) {
-        return String.join("\n",
-                "import asyncio,sys,struct",
-                "from edge_tts import Communicate",
-                "async def run():",
-                "  while True:",
-                "    line=sys.stdin.readline()",
-                "    if not line: break",
-                "    text=line.rstrip()",
-                "    if not text: continue",
-                "    data=b''",
-                "    async for c in Communicate(text,\"" + voice + "\").stream():",
-                "      if c['type']=='audio': data+=c['data']",
-                "    sys.stdout.buffer.write(struct.pack('<I',len(data)))",
-                "    sys.stdout.buffer.write(data)",
-                "    sys.stdout.buffer.flush()",
-                "asyncio.run(run())");
+    private static String truncate(String text) {
+        if (text == null) return "null";
+        return text.length() > 50 ? text.substring(0, 50) + "..." : text;
     }
 }
