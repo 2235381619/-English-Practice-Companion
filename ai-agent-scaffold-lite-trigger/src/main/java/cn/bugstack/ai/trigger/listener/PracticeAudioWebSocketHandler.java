@@ -109,13 +109,15 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                     practiceFactory.strategyHandler();
             handler.apply(req, ctx);
 
-            String json = String.format(
-                    "{\"asrText\":\"%s\",\"replyText\":\"%s\",\"audioUrl\":\"%s\"}",
-                    escapeJson(ctx.getAsrText() != null ? ctx.getAsrText() : ""),
-                    escapeJson(ctx.getReplyText() != null ? ctx.getReplyText() : ""),
-                    escapeJson(ctx.getAudioUrl() != null ? ctx.getAudioUrl() : "")
-            );
-            sendJson(session, json);
+            com.alibaba.fastjson.JSONObject resp = new com.alibaba.fastjson.JSONObject();
+            resp.put("asrText", ctx.getAsrText() != null ? ctx.getAsrText() : "");
+            resp.put("replyText", ctx.getReplyText() != null ? ctx.getReplyText() : "");
+            resp.put("correctedText", ctx.getCorrectedText() != null ? ctx.getCorrectedText() : "");
+            resp.put("grammarIssues", ctx.getGrammarIssues() != null ? ctx.getGrammarIssues() : new java.util.ArrayList());
+            resp.put("suggestions", ctx.getSuggestions() != null ? ctx.getSuggestions() : new java.util.ArrayList());
+            resp.put("score", ctx.getScore());
+            resp.put("audioUrl", ctx.getAudioUrl() != null ? ctx.getAudioUrl() : "");
+            sendJson(session, resp.toJSONString());
             log.info("Audio processed: sessionId={}, asrText=\"{}\", replyText=\"{}\"",
                     sessionId, ctx.getAsrText(), ctx.getReplyText());
         } catch (Exception e) {

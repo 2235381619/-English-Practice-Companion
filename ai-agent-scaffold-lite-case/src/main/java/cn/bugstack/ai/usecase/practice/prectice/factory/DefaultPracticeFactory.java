@@ -27,6 +27,10 @@ public class DefaultPracticeFactory {
         private String systemPrompt;
         private String asrText;
         private String replyText;
+        private String correctedText;
+        private java.util.List<String> grammarIssues = new java.util.ArrayList<>();
+        private java.util.List<String> suggestions = new java.util.ArrayList<>();
+        private int score;
         private String audioUrl;
         private boolean success;
         private String errorMsg;

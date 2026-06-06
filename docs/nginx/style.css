@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    AI Agent Scaffold Lite - 全局样式
    Codex 风格白色主题
    ============================================ */
@@ -849,3 +849,20 @@ input, textarea {
 .practice-mic-btn.processing { opacity: .6; cursor: wait; }
 .practice-mic-btn svg.spin { animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Evaluation styles for practice */
+.msg-eval {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #64748b;
+}
+.eval-label { font-weight: 500; margin-top: 4px; color: #94a3b8; }
+.eval-line { margin: 2px 0; }
+.eval-correct { color: #059669; }
+.eval-issue { color: #e11d48; }
+.eval-suggestion { color: #6366f1; }
+.eval-score { margin-top: 4px; color: #f59e0b; font-weight: 600; }
+.pmsg-text.reply { color: #1e293b; font-weight: 500; }

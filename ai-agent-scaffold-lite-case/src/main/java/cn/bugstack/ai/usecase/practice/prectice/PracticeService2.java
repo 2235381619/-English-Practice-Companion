@@ -30,10 +30,7 @@ public class PracticeService2 implements IPracticeService2 {
 
         log.info("PracticeService2: asrText=\"{}\", replyText=\"{}\"", ctx.getAsrText(), ctx.getReplyText());
 
-        PracticeResult result = new PracticeResult();
-        result.setAsrText(ctx.getAsrText());
-        result.setReplyText(ctx.getReplyText());
-        result.setAudioUrl(ctx.getAudioUrl());
+        PracticeResult result = PracticeResult.fromContext(ctx);
         return result;
     }
 }

@@ -144,7 +144,10 @@ function sendText() {
 function handleResult(data) {
   if (data.asrText) addMessage("user", data.asrText);
   var reply = data.replyText || data.reply || data.aiReply || "";
-  if (reply) addMessage("assistant", reply);
+  if (reply) {
+    messages.push({ role: "assistant", content: reply, correctedText: data.correctedText || "", grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || [], score: data.score || 0 });
+    renderMessages();
+  }
   mode = "idle";
   if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";
@@ -159,7 +162,26 @@ function renderMessages() {
     if (m.role === "user") {
       return '<div class="pmsg user"><div class="pmsg-bubble user-bubble"><div class="pmsg-user-label">You</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
     }
-    return '<div class="pmsg tutor"><div class="pmsg-bubble tutor-bubble"><div class="pmsg-user-label">AI</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
+    var evalHtml = "";
+    var hasEval = m.correctedText || (m.grammarIssues && m.grammarIssues.length > 0) || (m.suggestions && m.suggestions.length > 0) || m.score > 0;
+    if (hasEval) {
+      evalHtml += "<div class=\"msg-eval\">";
+      if (m.correctedText && m.correctedText !== m.content) {
+        evalHtml += "<div class=\"eval-line eval-correct\">\u2713 " + esc(m.correctedText) + "</div>";
+      }
+      if (m.grammarIssues && m.grammarIssues.length > 0) {
+        m.grammarIssues.forEach(function(g) { evalHtml += "<div class=\"eval-line eval-issue\">\u2022 " + esc(g) + "</div>"; });
+      }
+      if (m.suggestions && m.suggestions.length > 0) {
+        evalHtml += "<div class=\"eval-label\">\uD83D\uDCA1 Suggestions:</div>";
+        m.suggestions.forEach(function(s) { evalHtml += "<div class=\"eval-line eval-suggestion\">- " + esc(s) + "</div>"; });
+      }
+      if (m.score > 0) {
+        evalHtml += "<div class=\"eval-line eval-score\">Score: " + m.score + "/10</div>";
+      }
+      evalHtml += "</div>";
+    }
+    return '<div class="pmsg tutor"><div class="pmsg-bubble tutor-bubble"><div class="pmsg-user-label">AI</div><div class="pmsg-text reply">' + esc(m.content) + '</div>' + evalHtml + '</div></div>';
   }).join("");
   document.getElementById("conversationEmpty").style.display = messages.length ? "none" : "block";
   scrollBottom();
