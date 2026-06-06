@@ -1,4 +1,4 @@
-﻿const PRACTICE_BASE = '/api/v1/practice'
+const PRACTICE_BASE = '/api/v1/practice'
 
 /**
  * 获取场景列表
@@ -46,19 +46,55 @@ export async function submitText(sessionId, text) {
 }
 
 /**
- * 提交音频文件
+ * 创建音频 WebSocket 连接
+ *
+ * 协议：(1) 连接后直接发送二进制 PCM 帧；(2) 发送文本 "END" 触发 ASR + 评测
+ *
  * @param {string} sessionId
- * @param {Blob|File} audioBlob
+ * @param {object} callbacks - { onResult, onError, onOpen }
+ * @returns {WebSocket}
  */
-export async function submitAudio(sessionId, audioBlob) {
-  const formData = new FormData()
-  formData.append('sessionId', sessionId)
-  formData.append('file', audioBlob, 'audio.wav')
-  const res = await fetch(`${PRACTICE_BASE}/audio`, {
-    method: 'POST',
-    body: formData
-  })
-  return res.json()
+export function createAudioWs(sessionId, { onResult, onError, onOpen } = {}) {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const wsUrl = `${protocol}//${window.location.host}/practice/audio/${sessionId}`
+  const ws = new WebSocket(wsUrl)
+  ws.binaryType = 'arraybuffer'
+
+  ws.onopen = () => onOpen?.()
+
+  ws.onmessage = (event) => {
+    if (typeof event.data === 'string') {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.error) {
+          onError?.(data.error)
+        } else {
+          onResult?.(data)
+        }
+      } catch {
+        onError?.('Parse error')
+      }
+    }
+  }
+
+  ws.onerror = () => onError?.('WebSocket connection error')
+  return ws
+}
+
+/**
+ * 发送 PCM 帧到 WebSocket
+ * @param {WebSocket} ws
+ * @param {Float32Array} float32Audio
+ */
+export function sendPcmFrame(ws, float32Audio) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return
+  const len = float32Audio.length
+  const pcm16 = new Int16Array(len)
+  for (let i = 0; i < len; i++) {
+    const s = Math.max(-1, Math.min(1, float32Audio[i]))
+    pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
+  }
+  ws.send(pcm16.buffer)
 }
 
 /**

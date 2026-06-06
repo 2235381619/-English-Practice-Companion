@@ -74,9 +74,12 @@ practice:
 # 语音服务提供方配置
 voice:
   asr:
-    provider: aliyun          # aliyun（默认） / iflytek
+    provider: iflytek          # aliyun（默认） / iflytek
   tts:
-    provider: edgetts         # edgetts（默认） / iflytek
+    provider: iflytek         # edgetts（默认） / iflytek
+
+
+
 
 
 

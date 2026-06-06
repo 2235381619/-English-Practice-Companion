@@ -1,12 +1,10 @@
-﻿<template>
+<template>
   <div class="practice-view">
-    <!-- Header -->
     <div class="header">
       <h2>English Practice</h2>
       <button v-if="sessionId" class="btn-close" @click="endSession">End Session</button>
     </div>
 
-    <!-- Scenario selector (before session starts) -->
     <ScenarioSelector
       v-if="!sessionId"
       :scenarios="scenarios"
@@ -14,7 +12,6 @@
       @select="startSession"
     />
 
-    <!-- Main content (during session) -->
     <template v-if="sessionId">
       <div class="main-area">
         <div class="chat-area">
@@ -26,7 +23,6 @@
         </div>
       </div>
 
-      <!-- Input area -->
       <div class="input-area">
         <input
           v-model="textInput"
@@ -49,7 +45,7 @@ import { ref, onUnmounted } from 'vue'
 import ScenarioSelector from '../components/ScenarioSelector.vue'
 import ConversationPanel from '../components/ConversationPanel.vue'
 import EvaluationPanel from '../components/EvaluationPanel.vue'
-import { listScenarios, createSession, submitText, submitAudio, closeSession } from '../api/practice.js'
+import { listScenarios, createSession, submitText, closeSession, createAudioWs } from '../api/practice.js'
 
 const scenarios = ref([])
 const selectedScenario = ref('')
@@ -59,13 +55,11 @@ const latestEval = ref(null)
 const textInput = ref('')
 const loading = ref(false)
 const recording = ref(false)
-
-let mediaRecorder = null
-let audioChunks = []
+let recordState = null
+let audioWs = null
 
 onUnmounted(() => stopMic())
 
-// Load scenarios on mount
 listScenarios().then(res => {
   if (res.data?.scenarios) scenarios.value = res.data.scenarios
 })
@@ -118,23 +112,91 @@ async function toggleMic() {
   }
 }
 
+// ────────── 录音（参考 bailing 模式）──────────
 async function startRecording() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    audioChunks = []
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data) }
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop())
-      const blob = new Blob(audioChunks, { type: 'audio/webm' })
-      if (blob.size > 1000 && sessionId.value) {
-        loading.value = true
-        const res = await submitAudio(sessionId.value, blob)
+    // 1. 先打开 WebSocket（连接是异步的，不阻塞）
+    const ws = createAudioWs(sessionId.value, {
+      onResult: (data) => {
         loading.value = false
-        handleResponse(res.data)
+        handleResponse(data)
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close()
+        }
+        audioWs = null
+      },
+      onError: (err) => {
+        loading.value = false
+        console.warn('WS error:', err)
+      }
+    })
+    audioWs = ws
+
+    // 2. 获取麦克风
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+    // 3. 创建 AudioContext（浏览器原生采样率，后续手动降采样到 16kHz）
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    const source = audioCtx.createMediaStreamSource(stream)
+    const processor = audioCtx.createScriptProcessor(4096, 1, 1)
+
+    const inputSampleRate = audioCtx.sampleRate // 通常是 48000
+    const outputSampleRate = 16000
+
+    // 降采样（平均值法，同 bailing）
+    function downsample(buffer, fromRate, toRate) {
+      if (fromRate === toRate) return buffer
+      const ratio = fromRate / toRate
+      const newLen = Math.round(buffer.length / ratio)
+      const result = new Float32Array(newLen)
+      let offsetResult = 0
+      let offsetBuffer = 0
+      while (offsetResult < result.length) {
+        const nextOffset = Math.round((offsetResult + 1) * ratio)
+        let accum = 0, count = 0
+        for (let i = offsetBuffer; i < nextOffset && i < buffer.length; i++) {
+          accum += buffer[i]
+          count++
+        }
+        result[offsetResult] = count > 0 ? accum / count : 0
+        offsetResult++
+        offsetBuffer = nextOffset
+      }
+      return result
+    }
+
+    // Float32 → Int16 PCM
+    function floatTo16bitPCM(input) {
+      const out = new Int16Array(input.length)
+      for (let i = 0; i < input.length; i++) {
+        const s = Math.max(-1, Math.min(1, input[i]))
+        out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
+      }
+      return out
+    }
+
+    // 4. 持续处理音频：降采样 → Int16 → 二进制发送
+    processor.onaudioprocess = (e) => {
+      const input = e.inputBuffer.getChannelData(0)
+      const downsampled = downsample(input, inputSampleRate, outputSampleRate)
+      const pcm16 = floatTo16bitPCM(downsampled)
+      if (audioWs && audioWs.readyState === WebSocket.OPEN) {
+        audioWs.send(pcm16.buffer)
       }
     }
-    mediaRecorder.start()
+
+    source.connect(processor)
+    processor.connect(audioCtx.destination)
+
+    recordState = {
+      audioCtx, source, processor, stream,
+      close() {
+        try { source.disconnect() } catch (e) {}
+        try { processor.disconnect() } catch (e) {}
+        audioCtx.close()
+        stream.getTracks().forEach(t => t.stop())
+      }
+    }
     recording.value = true
   } catch (e) {
     console.warn('Mic error:', e)
@@ -142,16 +204,25 @@ async function startRecording() {
 }
 
 function stopRecording() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop()
-  }
+  if (!recordState) return
+  recordState.close()
+  recordState = null
   recording.value = false
+
+  // 发送 END 触发后端处理
+  if (audioWs && audioWs.readyState === WebSocket.OPEN) {
+    loading.value = true
+    audioWs.send('END')
+  }
 }
 
 function stopMic() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stream?.getTracks().forEach(t => t.stop())
-    mediaRecorder.stop()
+  if (recordState) { recordState.close(); recordState = null }
+  if (audioWs) {
+    if (audioWs.readyState === WebSocket.OPEN || audioWs.readyState === WebSocket.CONNECTING) {
+      audioWs.close()
+    }
+    audioWs = null
   }
   recording.value = false
 }
@@ -186,5 +257,3 @@ async function endSession() {
 .btn-send:disabled { opacity: .5; cursor: not-allowed; }
 .btn-send:hover:not(:disabled) { background: #357abd; }
 </style>
-
-

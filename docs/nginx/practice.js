@@ -1,340 +1,211 @@
-﻿/**
- * English Practice Mode — VAD auto-conversation
- */
 
-const PRACTICE_API = 'http://localhost:8091/api/v1/practice';
+const WS_BASE = "ws://localhost:8091/practice/audio";
+const PRACTICE_API = API_BASE + "/practice";
 
-const VAD_THRESHOLD = 2500;
-const SILENCE_TIMEOUT = 2000;
-const MAX_RECORD_DURATION = 15000;  // 15 seconds max per recording
+let sessionId = "";
+let mode = "idle";
+let messages = [];
+let selectedScenario = null;
 
-const practice = {
-  scenarios: [], selectedScenario: null, sessionId: '',
-  rounds: [], latestEval: null,
-  mode: 'idle', // idle | listening | processing
-  loading: false
-};
+let rec = { stream: null, ctx: null, source: null, analyser: null, processor: null, ws: null, rafId: null, canvasCtx: null };
 
-// VAD state (not exposed in practice object to keep it clean)
-let vad = { stream: null, context: null, analyser: null, recorder: null, chunks: [], silenceTimer: null, rafId: null };
-
-// ===== Init =====
-async function initPractice() {
-  try {
-    const res = await fetch(PRACTICE_API + '/scenarios');
-    const json = await res.json();
-    if (json.code === '0000' && json.data?.scenarios) {
-      practice.scenarios = json.data.scenarios;
-      renderScenarioCards();
-    }
-  } catch (e) { console.warn('Failed to load scenarios:', e); }
-}
-
-// ===== Scenario Cards =====
-function renderScenarioCards() {
-  const icons = { interview: '💼', restaurant: '🍽️', meeting: '📋' };
-  const descs = {
-    interview: 'Practice a senior tech interview with real-time feedback',
-    restaurant: 'Role-play ordering food at a restaurant',
-    meeting: 'Simulate a business meeting conversation'
-  };
-  document.getElementById('scenarioCards').innerHTML = practice.scenarios.map((s, i) => `\n    <div class="scenario-card" style="--i:${i}" onclick="startPracticeSession('${s.code}')">\n      <div class="scenario-card-icon">${icons[s.code] || '🎯'}</div>\n      <div class="scenario-card-name">${s.name}</div>\n      <div class="scenario-card-desc">${descs[s.code] || ''}</div>\n    </div>\n  `).join('');
-}
-
-// ===== Session =====
-async function startPracticeSession(code) {
-  practice.selectedScenario = code;
-  try {
-    const res = await fetch(PRACTICE_API + '/session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scenarioCode: code })
-    });
-    const json = await res.json();
-    if (json.code === '0000' && json.data?.sessionId) {
-      practice.sessionId = json.data.sessionId;
-      practice.rounds = []; practice.latestEval = null;
-      showSessionUI(code);
-    }
-  } catch (e) { console.warn('Session creation failed:', e); }
-}
-
-function showSessionUI(code) {
-  const scenario = practice.scenarios.find(s => s.code === code);
-  document.getElementById('scenarioSelection').style.display = 'none';
-  document.getElementById('practiceSession').style.display = 'flex';
-  document.getElementById('practiceInput').style.display = 'block';
-  document.getElementById('practiceEndBtn').style.display = 'block';
-  document.getElementById('practiceTitle').textContent = '🎯 ' + (scenario?.name || 'Practice');
-  document.getElementById('practiceScenario').textContent = 'Click 🎤 to start a hands-free conversation';
-  document.getElementById('conversationEmpty').style.display = 'block';
-  document.getElementById('practiceMessageList').innerHTML = '';
-  document.getElementById('evaluationPanel').style.display = 'none';
-  document.getElementById('practiceTextInput').focus();
-}
-
-async function endPracticeSession() {
-  if (!practice.sessionId) return;
-  stopConversation();
-  try { await fetch(PRACTICE_API + '/session/' + practice.sessionId, { method: 'DELETE' }); } catch (e) {}
-  practice.sessionId = ''; practice.rounds = []; practice.latestEval = null;
-  document.getElementById('scenarioSelection').style.display = 'block';
-  document.getElementById('practiceSession').style.display = 'none';
-  document.getElementById('practiceInput').style.display = 'none';
-  document.getElementById('practiceEndBtn').style.display = 'none';
-  document.getElementById('practiceTitle').textContent = 'English Speaking Practice';
-  document.getElementById('practiceScenario').textContent = '';
-}
-
-// ===== Text =====
-async function sendPracticeText() {
-  const input = document.getElementById('practiceTextInput');
-  const text = input.value.trim();
-  if (!text || !practice.sessionId || practice.loading) return;
-  input.value = '';
-  practice.loading = true;
-  loadingUi(true);
-  try {
-    const p = new URLSearchParams({ sessionId: practice.sessionId, text });
-    const res = await fetch(PRACTICE_API + '/text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: p
-    });
-    const json = await res.json();
-    if (json.code === '0000' && json.data) handleResponse(json.data);
-  } catch (e) { console.warn('Text failed:', e); }
-  finally { practice.loading = false; loadingUi(false); }
-}
-
-// ===== VAD Conversation =====
-async function toggleConversation() {
-  if (practice.mode === 'listening') {
-    stopConversation();
-  } else if (practice.mode === 'idle') {
-    await startConversation();
+function initPractice() {
+  sessionId = "session_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  selectedScenario = null;
+  document.getElementById("practiceScenario").textContent = "Choose a scenario";
+  document.getElementById("scenarioSelection").style.display = "block";
+  document.getElementById("practiceSession").style.display = "none";
+  document.getElementById("practiceInput").style.display = "none";
+  document.getElementById("practiceEndBtn").style.display = "none";
+  var cards = document.getElementById("scenarioCards");
+  if (cards) {
+    cards.innerHTML =
+      "<div class=\"scenario-card\" onclick=\"selectScenario('default')\"><div class=\"scenario-card-icon\">&#x1F4AC;</div><div class=\"scenario-card-name\">Free Chat</div><div class=\"scenario-card-desc\">Casual conversation</div></div>" +
+      "<div class=\"scenario-card\" onclick=\"selectScenario('interview')\"><div class=\"scenario-card-icon\">&#x1F4BC;</div><div class=\"scenario-card-name\">Interview</div><div class=\"scenario-card-desc\">Tech interview</div></div>" +
+      "<div class=\"scenario-card\" onclick=\"selectScenario('restaurant')\"><div class=\"scenario-card-icon\">&#x1F37D;</div><div class=\"scenario-card-name\">Restaurant</div><div class=\"scenario-card-desc\">Ordering food</div></div>" +
+      "<div class=\"scenario-card\" onclick=\"selectScenario('meeting')\"><div class=\"scenario-card-icon\">&#x1F4CB;</div><div class=\"scenario-card-name\">Meeting</div><div class=\"scenario-card-desc\">Business meeting</div></div>";
   }
-  // 'processing' state: ignore click
+  updateUI();
 }
 
-async function startConversation() {
-  if (!practice.sessionId || practice.loading) return;
-
-  // Acquire mic stream once
-  if (!vad.stream) {
-    try {
-      vad.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      vad.context = new (window.AudioContext || window.webkitAudioContext)();
-      const source = vad.context.createMediaStreamSource(vad.stream);
-      vad.analyser = vad.context.createAnalyser();
-      vad.analyser.fftSize = 256;
-      source.connect(vad.analyser);
-    } catch (e) {
-      console.warn('Mic access denied:', e);
-      return;
-    }
-  }
-
-  beginListening();
+function selectScenario(code) {
+  selectedScenario = code;
+  var labels = { "default":"Free Chat", "interview":"Interview", "restaurant":"Restaurant", "meeting":"Meeting" };
+  document.getElementById("practiceScenario").textContent = "Connected: " + (labels[code] || "Free Chat");
+  document.getElementById("scenarioSelection").style.display = "none";
+  document.getElementById("practiceSession").style.display = "flex";
+  document.getElementById("practiceInput").style.display = "block";
+  document.getElementById("practiceEndBtn").style.display = "block";
+  updateUI();
 }
 
-function beginListening() {
-  vad.voiceHold = 0;
-  vad.speaking = false;
-  vad.maxTimer = setTimeout(() => {
-    if (practice.mode === 'listening') stopForProcessing();
-  }, MAX_RECORD_DURATION);
-  vad.chunks = [];
-  vad.recorder = new MediaRecorder(vad.stream, { mimeType: 'audio/webm' });
-  vad.recorder.ondataavailable = e => { if (e.data.size > 0) vad.chunks.push(e.data); };
-  vad.recorder.onstop = () => processAudio();
-  vad.recorder.start();
-
-  practice.mode = 'listening';
-  updateMicUi();
-  document.getElementById('practiceScenario').textContent = '🎤 Listening... speak now';
-
-  vad.silenceTimer = null;
-  vadLoop();
+function getScenarioLabel(code) {
+  var labels = { "default":"Free Chat", "interview":"Interview", "restaurant":"Restaurant", "meeting":"Meeting" };
+  return labels[code] || "Free Chat";
 }
 
-function vadLoop() {
-  if (practice.mode !== "listening") return;
-
-  var data = new Uint8Array(vad.analyser.frequencyBinCount);
-  vad.analyser.getByteTimeDomainData(data);
-
-  var sum = 0;
-  for (var i = 0; i < data.length; i++) {
-    var v = (data[i] - 128) / 128;
-    sum += v * v;
-  }
-  var rms = Math.sqrt(sum / data.length) * 10000;
-
-  if (rms > VAD_THRESHOLD) {
-    vad.voiceHold += 50;
-    if (vad.voiceHold > 200) {
-      vad.speaking = true;
-      clearTimeout(vad.silenceTimer);
-      vad.silenceTimer = null;
-    }
-  } else {
-    vad.voiceHold = 0;
-    if (vad.speaking && !vad.silenceTimer) {
-      vad.silenceTimer = setTimeout(function() {
-        if (practice.mode === "listening") stopForProcessing();
-      }, SILENCE_TIMEOUT);
-    }
-  }
-
-  vad.rafId = requestAnimationFrame(vadLoop);
-}
-function stopForProcessing() {
-  practice.mode = "processing";
-  clearTimeout(vad.silenceTimer);
-  clearTimeout(vad.maxTimer);
-  cancelAnimationFrame(vad.rafId);
-  if (vad.recorder && vad.recorder.state !== 'inactive') vad.recorder.stop();
-  updateMicUi();
-}
-
-function stopConversation() {
-  practice.mode = 'idle';
-  clearTimeout(vad.silenceTimer);
-  clearTimeout(vad.maxTimer);
-  cancelAnimationFrame(vad.rafId);
-  if (vad.recorder && vad.recorder.state !== 'inactive') vad.recorder.stop();
-  if (vad.stream) { vad.stream.getTracks().forEach(t => t.stop()); vad.stream = null; }
-  if (vad.context) { vad.context.close(); vad.context = null; }
-  updateMicUi();
-  document.getElementById('practiceScenario').textContent = 'Click 🎤 to start a hands-free conversation';
-}
-
-async function processAudio() {
-  if (vad.chunks.length === 0) { autoRelisten(); return; }
-  const blob = new Blob(vad.chunks, { type: 'audio/webm' });
-  if (blob.size < 8000) { autoRelisten(); return; }
-
-  document.getElementById('practiceScenario').textContent = '⏳ Processing...';
-
+function startRecording() {
+  if (!sessionId || mode !== "idle") return;
   try {
-    const fd = new FormData();
-    fd.append('sessionId', practice.sessionId);
-    fd.append('file', blob, 'recording.webm');
-    const res = await fetch(PRACTICE_API + '/audio', { method: 'POST', body: fd });
-    const json = await res.json();
-    if (json.code === '0000' && json.data) handleResponse(json.data);
-  } catch (e) { console.warn('Audio failed:', e); }
+    var ws = new WebSocket(WS_BASE + "/" + sessionId);
+    ws.binaryType = "arraybuffer";
+    ws.onopen = function() { ws.send(JSON.stringify({ type: "config", scenarioCode: selectedScenario || "default" })); };
+    ws.onmessage = function(ev) {
+      if (typeof ev.data === "string") { try { handleResult(JSON.parse(ev.data)); } catch(e) {} }
+    };
+    ws.onerror = function() {};
+    ws.onclose = function() { if (mode === "recording") stopRecording(); };
+    rec.ws = ws;
+  } catch(e) { return; }
 
-  autoRelisten();
+  navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true } })
+  .then(function(stream) {
+    rec.stream = stream;
+    rec.ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    rec.source = rec.ctx.createMediaStreamSource(stream);
+    rec.analyser = rec.ctx.createAnalyser(); rec.analyser.fftSize = 256;
+    rec.source.connect(rec.analyser);
+    rec.processor = rec.ctx.createScriptProcessor(4096, 1, 1);
+    rec.source.connect(rec.processor); rec.processor.connect(rec.ctx.destination);
+    rec.processor.onaudioprocess = function(e) {
+      if (mode !== "recording") return;
+      var input = e.inputBuffer.getChannelData(0);
+      var i16 = new Int16Array(input.length);
+      for (var i = 0; i < input.length; i++) { var s = Math.max(-1, Math.min(1, input[i])); i16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF; }
+      if (rec.ws && rec.ws.readyState === WebSocket.OPEN) rec.ws.send(i16.buffer);
+    };
+    var canvas = document.getElementById("waveCanvas");
+    if (canvas) {
+      rec.canvasCtx = canvas.getContext("2d");
+      var rect = canvas.parentElement.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; rec.canvasCtx.scale(dpr, dpr);
+    }
+    mode = "recording";
+    var vis = document.getElementById("practiceVisualizer"); if (vis) vis.style.display = "block";
+    document.getElementById("practiceScenario").textContent = "Recording...";
+    updateUI(); drawWaveform();
+  }).catch(function() {});
 }
 
-function autoRelisten() {
-  if (!practice.sessionId || practice.mode === 'idle') return;
-  setTimeout(beginListening, 2000);
+function drawWaveform() {
+  if (!rec.canvasCtx || !rec.analyser) return;
+  var canvas = document.getElementById("waveCanvas");
+  var d = new Uint8Array(rec.analyser.frequencyBinCount);
+  var w = canvas.width / (window.devicePixelRatio || 1);
+  var h = canvas.height / (window.devicePixelRatio || 1);
+  function draw() {
+    if (mode !== "recording") return;
+    rec.rafId = requestAnimationFrame(draw);
+    rec.analyser.getByteTimeDomainData(d);
+    rec.canvasCtx.clearRect(0, 0, w, h);
+    rec.canvasCtx.strokeStyle = "#2563eb"; rec.canvasCtx.lineWidth = 2; rec.canvasCtx.beginPath();
+    for (var i = 0; i < d.length; i++) { var x = (i / d.length) * w; var y = (d[i] / 128.0) * h / 2; i === 0 ? rec.canvasCtx.moveTo(x, y) : rec.canvasCtx.lineTo(x, y); }
+    rec.canvasCtx.lineTo(w, h / 2); rec.canvasCtx.stroke();
+  }
+  draw();
 }
 
-// ===== Response =====
-function handleResponse(data) {
-  if (!data) return;
-  const e = {
-    asrText: data.asrText || '', aiReply: data.aiReply || '',
-    score: data.score || 0, correctedText: data.correctedText,
-    grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || []
-  };
-  practice.latestEval = e;
-  practice.rounds.push({ userInput: data.asrText || '', asrText: data.asrText || '', evaluation: e });
-  document.getElementById('conversationEmpty').style.display = 'none';
-  renderMessages();
-  renderEval(e);
+function stopRecording() {
+  if (mode !== "recording") return;
+  mode = "processing";
+  document.getElementById("practiceScenario").textContent = "Processing...";
+  var vis = document.getElementById("practiceVisualizer"); if (vis) vis.style.display = "none";
+  updateUI();
+  cancelAnimationFrame(rec.rafId); rec.rafId = null;
+  if (rec.canvasCtx) { var cv = document.getElementById("waveCanvas"); if (cv) rec.canvasCtx.clearRect(0, 0, cv.width / (window.devicePixelRatio || 1), cv.height / (window.devicePixelRatio || 1)); }
+  if (rec.processor) { try { rec.processor.disconnect(); } catch(e) {} rec.processor = null; }
+  if (rec.source) { try { rec.source.disconnect(); } catch(e) {} rec.source = null; }
+  if (rec.analyser) { try { rec.analyser.disconnect(); } catch(e) {} rec.analyser = null; }
+  if (rec.stream) { rec.stream.getTracks().forEach(function(t) { t.stop(); }); rec.stream = null; }
+  if (rec.ctx) { rec.ctx.close().catch(function(){}); rec.ctx = null; }
+  if (rec.ws && rec.ws.readyState === WebSocket.OPEN) rec.ws.send("END");
 }
+
+function toggleRecording() {
+  if (mode === "idle") startRecording(); else if (mode === "recording") stopRecording();
+}
+
+function sendText() {
+  var inp = document.getElementById("practiceTextInput");
+  var text = inp.value.trim();
+  if (!text || !sessionId || mode === "processing") return;
+  inp.value = "";
+  addMessage("user", text);
+  fetch(PRACTICE_API + "/text", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId: sessionId, text: text, scenarioCode: selectedScenario || "default" })
+  }).then(function(r) { return r.json(); }).then(function(json) {
+    if (json.code === "0000" && json.data) handleResult(json.data);
+  }).catch(function(e) { console.warn(e); });
+}
+
+function handleResult(data) {
+  if (data.asrText) addMessage("user", data.asrText);
+  var reply = data.replyText || data.reply || data.aiReply || "";
+  if (reply) addMessage("assistant", reply);
+  mode = "idle";
+  if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
+  document.getElementById("practiceScenario").textContent = "Press mic to speak";
+  updateUI();
+}
+
+function addMessage(role, content) { messages.push({ role: role, content: content }); renderMessages(); }
 
 function renderMessages() {
-  const list = document.getElementById('practiceMessageList');
-  list.innerHTML = practice.rounds.map(r => {
-    const e = r.evaluation;
-    const fix = e.correctedText && e.correctedText !== e.asrText;
-    return `
-      <div class="pmsg user">
-        <div class="pmsg-bubble user-bubble">
-          <div class="pmsg-user-label">You</div>
-          <div class="pmsg-text">${esc(r.asrText || r.userInput)}</div>
-        </div>
-      </div>
-      <div class="pmsg tutor">
-        <div class="pmsg-bubble tutor-bubble">
-          <div class="pmsg-user-label">Tutor</div>
-          <div class="pmsg-text">${esc(e.aiReply)}</div>
-          ${fix ? `<div class="pmsg-correction">✓ ${esc(e.correctedText)}</div>` : ''}
-          ${e.grammarIssues?.length ? `<div class="pmsg-issues">${e.grammarIssues.map(g => `<div class="pmsg-issue">• ${esc(g)}</div>`).join('')}</div>` : ''}
-        </div>
-      </div>`;
-  }).join('');
+  var list = document.getElementById("practiceMessageList");
+  list.innerHTML = messages.map(function(m) {
+    if (m.role === "user") {
+      return '<div class="pmsg user"><div class="pmsg-bubble user-bubble"><div class="pmsg-user-label">You</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
+    }
+    return '<div class="pmsg tutor"><div class="pmsg-bubble tutor-bubble"><div class="pmsg-user-label">AI</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
+  }).join("");
+  document.getElementById("conversationEmpty").style.display = messages.length ? "none" : "block";
   scrollBottom();
 }
 
-function renderEval(d) {
-  const p = document.getElementById('evaluationPanel');
-  p.style.display = 'flex';
-  const c = d.score >= 8 ? 'high' : d.score >= 5 ? 'mid' : 'low';
-  p.innerHTML = `
-    <div class="eval-header">
-      <span class="eval-label">Evaluation</span>
-      <span class="eval-score ${c}">${d.score}/10</span>
-    </div>
-    ${d.correctedText ? `<div class="eval-section"><div class="eval-section-title">✓ Corrected</div><div class="eval-text">${esc(d.correctedText)}</div></div>` : ''}
-    ${d.grammarIssues?.length ? `<div class="eval-section"><div class="eval-section-title">Issues</div>${d.grammarIssues.map(g => `<div class="eval-issue">${esc(g)}</div>`).join('')}</div>` : ''}
-    ${d.suggestions?.length ? `<div class="eval-section"><div class="eval-section-title">Suggestions</div>${d.suggestions.map(s => `<div class="eval-suggestion">${esc(s)}</div>`).join('')}</div>` : ''}`;
-}
-
-// ===== UI =====
-function updateMicUi() {
-  const btn = document.getElementById('practiceMicBtn');
-  if (!btn) return;
-  btn.classList.remove('recording', 'processing');
-  if (practice.mode === 'listening') {
-    btn.classList.add('recording');
-    btn.title = 'Click to stop conversation';
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
-  } else if (practice.mode === 'processing') {
-    btn.classList.add('processing');
-    btn.title = 'Processing...';
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="30 70" stroke-linecap="round"/></svg>`;
+function updateUI() {
+  var btn = document.getElementById("practiceMicBtn");
+  if (!btn) return; btn.classList.remove("recording"); btn.disabled = false;
+  if (mode === "recording") {
+    btn.classList.add("recording");
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+  } else if (mode === "processing") {
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="30 70" stroke-linecap="round"/></svg>';
   } else {
-    btn.title = 'Start listening (hands-free)';
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>`;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>';
   }
 }
 
-function loadingUi(v) {
-  const el = document.getElementById('practiceTextInput');
-  if (el) el.disabled = v;
-}
-function scrollBottom() { requestAnimationFrame(() => { const c = document.getElementById('practiceConversation'); if (c) c.scrollTop = c.scrollHeight; }); }
-function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function scrollBottom() { requestAnimationFrame(function() { var c = document.getElementById("practiceConversation"); if (c) c.scrollTop = c.scrollHeight; }); }
 
-// ===== Mode Switch =====
-function switchMode(mode) {
-  if (practice.mode !== 'idle') stopConversation();
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-  const chat = document.getElementById('chatMode');
-  const prac = document.getElementById('practiceMode');
-  if (mode === 'practice') {
-    chat.style.display = 'none'; prac.style.display = 'flex';
-    document.querySelector('.sidebar').style.display = 'none';
-    document.querySelector('.main-area').style.flex = '1';
-    if (!practice.scenarios.length) initPractice();
+function esc(s) { if (!s) return ""; var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function switchMode(modeVal) {
+  document.querySelectorAll(".nav-tab").forEach(function(t) { t.classList.toggle("active", t.dataset.mode === modeVal); });
+  var chat = document.getElementById("chatMode"); var prac = document.getElementById("practiceMode");
+  if (modeVal === "practice") {
+    chat.style.display = "none"; prac.style.display = "flex";
+    document.querySelector(".sidebar").style.display = "none";
+    document.querySelector(".main-area").style.flex = "1";
+    initPractice();
   } else {
-    chat.style.display = 'flex'; prac.style.display = 'none';
-    document.querySelector('.sidebar').style.display = '';
-    document.querySelector('.main-area').style.flex = '';
+    chat.style.display = "flex"; prac.style.display = "none";
+    document.querySelector(".sidebar").style.display = "";
+    document.querySelector(".main-area").style.flex = "";
   }
 }
 
-// Also need to update the HTML onclick. Add a small polyfill to redirect old name.
-window.togglePracticeMic = toggleConversation;
+function endPracticeSession() {
+  stopRecording();
+  document.getElementById("scenarioSelection").style.display = "block";
+  document.getElementById("practiceSession").style.display = "none";
+  document.getElementById("practiceInput").style.display = "none";
+  document.getElementById("practiceEndBtn").style.display = "none";
+  document.getElementById("practiceTitle").textContent = "AI Voice Chat";
+}
 
-console.log('Practice module loaded (VAD auto-conversation)');
-
-
-
+setTimeout(initPractice, 500);
+console.log("Practice loaded");

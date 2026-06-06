@@ -1,4 +1,4 @@
-package cn.bugstack.ai.usecase.practice;
+package cn.bugstack.ai.usecase.practice.prectice;
 
 import cn.bugstack.ai.domain.practice.adapter.ISessionRepository;
 import cn.bugstack.ai.domain.practice.model.entity.ConversationRound;
@@ -6,11 +6,15 @@ import cn.bugstack.ai.domain.practice.model.entity.PracticeSession;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.domain.practice.model.valobj.SessionReport;
-import cn.bugstack.ai.domain.practice.service.IAliyunAsrService;
+import cn.bugstack.ai.domain.practice.service.IAsrService;
+import cn.bugstack.ai.usecase.practice.IPracticeService;
+import jakarta.annotation.Resource;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
 import cn.bugstack.ai.domain.practice.service.ITtsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,29 +24,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * 管理 PracticeSession 生命周期。
  */
 @Slf4j
+@Service
 public class PracticeServiceImpl implements IPracticeService {
 
-    //private final IAudioService audioService;
-    private final IAliyunAsrService aliyunAsrService;
-    private final IEvaluationService evaluationService;
-    private final ITtsService ttsService;
-    private final ISessionRepository sessionRepository;
+    @Resource
+    private  IEvaluationService evaluationService;
+    @Resource
+    private ITtsService ttsService;
+    @Resource
+    private IAsrService asrService;
+    @Resource
+    private  ISessionRepository sessionRepository;
 
     private final ConcurrentHashMap<String, PracticeSession> sessions = new ConcurrentHashMap<>();
-
-    public PracticeServiceImpl(
-                                //IAudioService audioService,
-                                IAliyunAsrService aliyunAsrService,
-                                IEvaluationService evaluationService,
-                                ITtsService ttsService,
-                                ISessionRepository sessionRepository) {
-        //this.audioService = audioService;
-        this.aliyunAsrService = aliyunAsrService;
-        this.evaluationService = evaluationService;
-        this.ttsService = ttsService;
-        this.sessionRepository = sessionRepository;
-    }
-
     @Override
     public PracticeSession createSession(Scenario scenario) {
         PracticeSession session = new PracticeSession(scenario);
@@ -64,6 +58,25 @@ public class PracticeServiceImpl implements IPracticeService {
     }
 
     @Override
+    public EvaluationResult processAudio(String sessionId, File audioFile) {
+        PracticeSession session = getSession(sessionId);
+        if (session == null || !session.isActive()) {
+            throw new IllegalStateException("Session not found or inactive: " + sessionId);
+        }
+        String text;
+        try {
+            text = asrService.transcribe(audioFile);
+        }
+        catch (Exception e) {
+            log.warn("ASR failed: {}", e.getMessage()); text = null;
+        }
+        if (text == null || text.isBlank()) {
+            return EvaluationResult.builder().originalText("").aiReply("Sorry, I didn't catch that.").score(0).build();
+        }
+        return processTextInternal(session, text);
+    }
+
+    @Override
     public EvaluationResult processAudio(String sessionId, byte[] audioData) {
         PracticeSession session = getSession(sessionId);
         if (session == null || !session.isActive()) {
@@ -72,7 +85,13 @@ public class PracticeServiceImpl implements IPracticeService {
 
         String text;
         try {
-            text = aliyunAsrService.transcribe(audioData, "webm");
+            File temp = File.createTempFile("audio_", ".pcm");
+            try {
+                java.nio.file.Files.write(temp.toPath(), audioData);
+                text = asrService.transcribe(temp);
+            } finally {
+                temp.delete();
+            }
         } catch (Exception e) {
             log.warn("ASR failed: {}", e.getMessage());
             text = null;

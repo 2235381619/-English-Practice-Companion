@@ -1,7 +1,6 @@
 package cn.bugstack.ai.domain.iflytek.service.impl;
 
 import cn.bugstack.ai.domain.iflytek.service.IIatService;
-import cn.bugstack.ai.domain.practice.service.IAliyunAsrService;
 import cn.xfyun.api.IatClient;
 import cn.xfyun.model.response.iat.IatResponse;
 import cn.xfyun.model.response.iat.IatResult;
@@ -26,10 +25,9 @@ import java.util.concurrent.TimeUnit;
  * 基于 IatClient WebSocket，直接将 byte[] 通过 ByteArrayInputStream 送入 SDK，
  * 无需写临时文件，无需 native dll。
  *
- * 同时实现 IAliyunAsrService 接口，可无缝替换阿里云 ASR。
  */
 @Slf4j
-public class IatServiceImpl implements IIatService, IAliyunAsrService {
+public class IatServiceImpl implements IIatService {
 
     private static final String FFMPEG = "C:\\ffmpge\\bin\\ffmpeg.exe";
 

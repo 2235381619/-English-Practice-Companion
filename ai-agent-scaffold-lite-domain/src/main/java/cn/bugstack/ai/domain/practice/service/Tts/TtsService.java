@@ -1,7 +1,8 @@
-package cn.bugstack.ai.domain.practice.service.impl;
+package cn.bugstack.ai.domain.practice.service.Tts;
 
 import cn.bugstack.ai.domain.practice.service.ITtsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
  * 维护长生命周期 Python edge-tts 子进程，通过 stdin/stdout 通信。
  */
 @Slf4j
+@Service
 public class TtsService implements ITtsService {
 
     private static final String DEFAULT_PYTHON = "C:\\Users\\kqj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe";

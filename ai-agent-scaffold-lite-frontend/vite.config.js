@@ -1,4 +1,4 @@
-﻿import { defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
@@ -9,8 +9,11 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:8091',
         changeOrigin: true
+      },
+      '/practice': {
+        target: 'ws://127.0.0.1:8091',
+        ws: true
       }
     }
   }
 })
-

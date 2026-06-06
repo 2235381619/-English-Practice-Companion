@@ -1,4 +1,4 @@
-package cn.bugstack.ai.domain.practice.service.impl;
+package cn.bugstack.ai.domain.practice.service.Evaluation;
 
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;

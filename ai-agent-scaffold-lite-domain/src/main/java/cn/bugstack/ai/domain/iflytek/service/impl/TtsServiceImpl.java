@@ -14,16 +14,16 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 讯飞在线语音合成实现
+ * 在线语音合成实现
  *
  * 基于 TtsClient WebSocket，参照官方 TtsClientApp 实现。
  * AbstractTtsWebSocketListener(File) 自动将音频写入文件，
  * onClose 后读取文件内容返回。
  *
- * 同时实现 practice.ITtsService 接口，可无缝替换 Edge-TTS。
+ * 同时实现 practice.ITtsService 接口，可无缝切换 Edge-TTS。
  */
 @Slf4j
-public class TtsServiceImpl implements ITtsService, cn.bugstack.ai.domain.practice.service.ITtsService {
+public class TtsServiceImpl implements ITtsService {
 
     private final TtsClient ttsClient;
     private volatile boolean running;
@@ -35,7 +35,7 @@ public class TtsServiceImpl implements ITtsService, cn.bugstack.ai.domain.practi
     @Override
     public void start() {
         running = true;
-        log.info("讯飞 TTS 引擎已启动");
+        log.info("开启 TTS 引擎已启动");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TtsServiceImpl implements ITtsService, cn.bugstack.ai.domain.practi
             log.warn("TTS 引擎未启动");
             return;
         }
-        // 服务端场景不做本地播放，仅合成返回数据
+        // 服务端场景不做本地播放，只合成返回数据
         try {
             synthesize(text);
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class TtsServiceImpl implements ITtsService, cn.bugstack.ai.domain.practi
             ttsClient.send(text, new AbstractTtsWebSocketListener(tmpFile) {
                 @Override
                 public void onSuccess(byte[] bytes) {
-                    // 父类 AbstractTtsWebSocketListener(file) 已自动写完文件
+                    // 父类 AbstractTtsWebSocketListener(file) 已自动写完成文件
                     latch.countDown();
                 }
 
@@ -116,7 +116,7 @@ public class TtsServiceImpl implements ITtsService, cn.bugstack.ai.domain.practi
     public void stop() {
         running = false;
         if (ttsClient != null) ttsClient.closeWebsocket();
-        log.info("讯飞 TTS 引擎已关闭");
+        log.info("启动 TTS 引擎已经关闭");
     }
 
     @Override
