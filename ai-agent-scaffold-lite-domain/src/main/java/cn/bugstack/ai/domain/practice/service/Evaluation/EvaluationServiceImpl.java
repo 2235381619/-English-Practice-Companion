@@ -54,13 +54,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
             Prompt prompt = new Prompt(messages);
             String response = evalChatModel.call(prompt).getResult().getOutput().getText();
             chatMemory.add(sessionId, new AssistantMessage(response));
-            return EvaluationResult.builder()
-                    .originalText(userText)
-                    .correctedText(response)
-                    .suggestions(new ArrayList<>().add())
-                    .aiReply(response)
-                    .score(5)
-                    .build();
+            return parseEvaluation(response, userText);
         } catch (Exception e) {
             log.warn("Evaluation failed, falling back: {}", e.getMessage());
             return fallbackEvaluation(userText, scenario);
@@ -143,6 +137,7 @@ private EvaluationResult parseEvaluation(String json, String originalText) {
                 .map(s -> s.replace("\\\"", "\"")).toList();
     }
 }
+
 
 
 
