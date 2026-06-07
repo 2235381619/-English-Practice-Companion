@@ -218,8 +218,10 @@ function handleEvaluation(data) {
 
 
 
-function fetchSessionReport() {
+function fetchSessionReport(retries) {
   if (!sessionId) return;
+  if (retries === undefined) retries = 0;
+  if (retries >= 10) return;
   fetch(PRACTICE_API + "/session/" + sessionId + "/report")
     .then(function(r) { return r.json(); })
     .then(function(json) {
@@ -228,10 +230,23 @@ function fetchSessionReport() {
         var last = rounds[rounds.length - 1];
         if (last && (last.correctedText || last.score)) {
           handleEvaluation(last);
+        } else if (retries < 9) {
+          setTimeout(function() { fetchSessionReport(retries + 1); }, 800);
         }
+      } else if (retries < 9) {
+        setTimeout(function() { fetchSessionReport(retries + 1); }, 800);
       }
     })
-    .catch(function(e) { console.warn("Report fetch failed:", e); });
+    .catch(function(e) {
+      console.warn("Report fetch failed:", e);
+      if (retries < 9) {
+        setTimeout(function() { fetchSessionReport(retries + 1); }, 800);
+      }
+    });
+}
+function exportSession() {
+  if (!sessionId) return;
+  window.open(API_BASE + "/practice/session/" + sessionId + "/export");
 }
 
 function addMessage(role, content) { messages.push({ role: role, content: content }); renderMessages(); }

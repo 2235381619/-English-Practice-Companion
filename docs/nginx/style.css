@@ -1020,3 +1020,24 @@ input, textarea {
   align-self: flex-end;
   margin-top: -16px;
 }
+/* Export button in practice panel */
+.export-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.export-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.export-btn:active {
+  transform: scale(0.98);
+}
