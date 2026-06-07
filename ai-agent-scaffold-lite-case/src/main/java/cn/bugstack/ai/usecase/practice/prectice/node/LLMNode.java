@@ -9,6 +9,7 @@ import cn.bugstack.ai.domain.practice.service.IEvaluationService;
 import cn.bugstack.ai.usecase.practice.prectice.AbstractPracticeServiceSupport;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
+import java.util.concurrent.CompletableFuture;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,17 +42,21 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         String reply = chatLlmService.chat(asrText, ctx.getSystemPrompt());
         ctx.setReplyText(reply);
 
-        try {
-            Scenario scenario = Scenario.fromCode(ctx.getScenarioCode());
-            EvaluationResult eval = evaluationService.evaluate(asrText, scenario, "");
-            ctx.setCorrectedText(eval.getCorrectedText());
-            ctx.setGrammarIssues(eval.getGrammarIssues());
-            ctx.setSuggestions(eval.getSuggestions());
-            ctx.setScore(eval.getScore());
-            log.info("LLMNode: eval score={}, issues={}", eval.getScore(), eval.getGrammarIssues().size());
-        } catch (Exception e) {
-            log.warn("Evaluation failed: {}", e.getMessage());
-        }
+        // 异步评测，不阻塞 TTS 合成
+        String scenarioCode = ctx.getScenarioCode();
+        String sessionId = req.getSessionId();
+        CompletableFuture.runAsync(() -> {
+            try {
+                Scenario scenario = Scenario.fromCode(scenarioCode);
+                EvaluationResult eval = evaluationService.evaluate(asrText, scenario, "");
+                PracticeAudioWebSocketHandler.sendEvalResult(sessionId, eval);
+                log.info("Async eval done: sessionId={}, score={}, issues={}",
+                        sessionId, eval.getScore(),
+                        eval.getGrammarIssues() != null ? eval.getGrammarIssues().size() : 0);
+            } catch (Exception e) {
+                log.warn("Async evaluation failed: {}", e.getMessage());
+            }
+        });
 
         log.info("LLMNode: sessionId={}, cost={}ms", req.getSessionId(), System.currentTimeMillis() - start);
         return router(req, ctx);
