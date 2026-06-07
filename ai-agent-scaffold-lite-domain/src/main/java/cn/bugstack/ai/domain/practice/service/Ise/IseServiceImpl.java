@@ -1,6 +1,5 @@
 package cn.bugstack.ai.domain.practice.service.Ise;
 
-import cn.bugstack.ai.config.IflytekProperties;
 import cn.bugstack.ai.domain.practice.model.valobj.IseResult;
 import cn.bugstack.ai.domain.practice.service.IIseService;
 import cn.xfyun.api.IseClient;
@@ -30,10 +29,10 @@ public class IseServiceImpl implements IIseService {
     private final String apiKey;
     private final String apiSecret;
 
-    public IseServiceImpl(IflytekProperties props) {
-        this.appId = props.getAppId();
-        this.apiKey = props.getApiKey();
-        this.apiSecret = props.getApiSecret();
+    public IseServiceImpl() {
+        this.appId = "aa5f53e2";
+        this.apiKey = "10ed6197def1ffa8ca32e0ae10c5fc61";
+        this.apiSecret = "NGIzMDgyM2RhMTg0NDFkN2MzNjVhNmQx";
     }
 
     @Override
@@ -101,7 +100,7 @@ public class IseServiceImpl implements IIseService {
     }
 
     private IseResult parseResult(String raw) {
-        log.debug("ISE raw response: {}", raw);
+        log.info("ISE raw response: {}", raw);
         IseResult.IseResultBuilder builder = IseResult.builder().rawResponse(raw).success(true);
 
         try {
@@ -113,11 +112,14 @@ public class IseServiceImpl implements IIseService {
             return builder.build();
         } catch (Exception ignored) {}
 
-        Pattern pattern = Pattern.compile("<(\\w+) value=\"([\\d.]+)\"/>");
+        Pattern pattern = Pattern.compile("<(\\w+)(?: value=\"([\\d.]+)\")?/?>([\\d.]+)?</\\1>");
         Matcher matcher = pattern.matcher(raw);
         while (matcher.find()) {
             String tag = matcher.group(1);
             double value = Double.parseDouble(matcher.group(2));
+            String scoreVal = matcher.group(2) != null ? matcher.group(2) : matcher.group(3);
+            if (scoreVal == null) continue;
+            double value = Double.parseDouble(scoreVal);
             switch (tag) {
                 case "total_score" -> builder.totalScore(value);
                 case "accuracy_score" -> builder.accuracyScore(value);
@@ -128,3 +130,5 @@ public class IseServiceImpl implements IIseService {
         return builder.build();
     }
 }
+
+
