@@ -1,5 +1,6 @@
 package cn.bugstack.ai.domain.practice.service.Tts;
 
+import cn.bugstack.ai.domain.practice.model.valobj.VoiceVo;
 import cn.bugstack.ai.domain.practice.service.ITtsService;
 import cn.xfyun.api.TtsClient;
 import cn.xfyun.model.response.TtsResponse;
@@ -19,8 +20,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * TTS 服务 — 讯飞 TtsClient (WebSocket 在线语音合成)
  *
- * 注入 IflytekConfiguration 中创建的 TtsClient 单例 Bean。
- * 使用 CountDownLatch 将异步 WebSocket 响应转为同步返回。
+ * 内部维护 TtsConfig 静态类存放固定参数（aue/auf/vcn/tte 等），
+ * TtsClient 在 synthesize 方法内按需创建，支持通过 VoiceVo 值对象动态传入 speed/volume/pitch。
  */
 @Slf4j
 @Service
@@ -28,25 +29,74 @@ public class TtsService implements ITtsService {
 
     private static final long TIMEOUT_SECONDS = 60;
 
-    private final TtsClient ttsClient;
+    /**
+     * 固定参数配置
+     */
+    private static class TtsConfig {
+        private static final String AUE = "lame";
+        private static final String AUF = "audio/L16;rate=16000";
+        private static final String VCN = "x4_enus_lucy_education";
+        private static final String TTE = "UTF8";
+        private static final String REG = "0";
+        private static final String RDN = "0";
+        private static final String ENT = "intp65_en";
+        private static final Integer BGS = 0;
+    }
 
-    public TtsService(TtsClient ttsClient) {
-        this.ttsClient = ttsClient;
+    private final String appId;
+    private final String apiKey;
+    private final String apiSecret;
+
+    public TtsService() {
+        this.appId = "aa5f53e2";
+        this.apiKey = "10ed6197def1ffa8ca32e0ae10c5fc61";
+        this.apiSecret = "NGIzMDgyM2RhMTg0NDFkN2MzNjVhNmQx";
+    }
+
+    private TtsClient buildClient(VoiceVo voice) {
+        TtsClient.Builder builder = new TtsClient.Builder()
+                .signature(appId, apiKey, apiSecret)
+                .aue(TtsConfig.AUE)
+                .auf(TtsConfig.AUF)
+                .vcn(TtsConfig.VCN)
+                .speed(voice.getSpeed())
+                .volume(voice.getVolume())
+                .pitch(voice.getPitch())
+                .tte(TtsConfig.TTE)
+                .reg(TtsConfig.REG)
+                .rdn(TtsConfig.RDN)
+                .ent(TtsConfig.ENT)
+                .bgs(TtsConfig.BGS);
+
+        if ("lame".equals(TtsConfig.AUE)) {
+            builder.sfl(1);
+        }
+
+        TtsClient client = builder.build();
+        log.debug("TtsClient 创建 voice={}, speed={}, volume={}, pitch={}",
+                TtsConfig.VCN, voice.getSpeed(), voice.getVolume(), voice.getPitch());
+        return client;
     }
 
     @Override
     public byte[] synthesize(String text) {
+        return synthesize(text, VoiceVo.defaultVoice());
+    }
+
+    @Override
+    public byte[] synthesize(String text, VoiceVo voice) {
         if (text == null || text.isBlank()) {
             log.warn("Empty text for TTS");
             return new byte[0];
         }
 
+        TtsClient client = buildClient(voice);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<byte[]> resultRef = new AtomicReference<>();
         AtomicReference<String> errorRef = new AtomicReference<>();
 
         try {
-            ttsClient.send(text, new AbstractTtsWebSocketListener() {
+            client.send(text, new AbstractTtsWebSocketListener() {
                 @Override
                 public void onSuccess(byte[] bytes) {
                     resultRef.set(bytes);
@@ -87,19 +137,23 @@ public class TtsService implements ITtsService {
             return new byte[0];
         }
 
-        log.info("TTS synthesized {} bytes for text: {}", audio.length, truncate(text));
+        log.info("TTS synthesized {} bytes, voice={}", audio.length, voice);
         return audio;
     }
 
     @Override
     public File synthesize(String text, File outputFile) {
-        byte[] audio = synthesize(text);
+        return synthesize(text, outputFile, VoiceVo.defaultVoice());
+    }
+
+    @Override
+    public File synthesize(String text, File outputFile, VoiceVo voice) {
+        byte[] audio = synthesize(text, voice);
         if (audio.length == 0) {
             return null;
         }
 
         try {
-            // 确保父目录存在
             File parent = outputFile.getParentFile();
             if (parent != null && !parent.exists()) {
                 parent.mkdirs();

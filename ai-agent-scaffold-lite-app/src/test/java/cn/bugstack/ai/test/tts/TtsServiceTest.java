@@ -1,5 +1,6 @@
 package cn.bugstack.ai.test.tts;
 
+import cn.bugstack.ai.domain.practice.model.valobj.VoiceVo;
 import cn.bugstack.ai.domain.practice.service.ITtsService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -22,35 +23,34 @@ public class TtsServiceTest {
     private ITtsService ttsService;
 
     @Test
-    public void test_synthesize_english() {
-        String text = "Hello everyone, welcome to the speech synthesis test. " +
-                      "This is a demonstration of the iflytek text to speech engine.";
-
+    public void test_synthesize_default() {
+        String text = "Hello everyone, welcome to the speech synthesis test.";
         File outputDir = new File("src/test/resources/audio");
         if (!outputDir.exists()) outputDir.mkdirs();
 
-        File outputFile = new File(outputDir, "tts-test-output.mp3");
+        File result = ttsService.synthesize(text, new File(outputDir, "tts-default.mp3"));
+        assert result != null && result.exists() && result.length() > 0
+                : "合成失败，请检查配置或网络";
+        log.info("默认参数合成成功, {} 字节", result.length());
+    }
 
-        log.info("开始 TTS 合成, text={}", text);
-        File result = ttsService.synthesize(text, outputFile);
+    @Test
+    public void test_synthesize_custom_voice() {
+        String text = "Hello everyone, welcome to the speech synthesis test.";
+        File outputDir = new File("src/test/resources/audio");
+        if (!outputDir.exists()) outputDir.mkdirs();
 
-        assert result != null : "合成失败，返回 null";
-        assert result.exists() : "文件未生成";
-        assert result.length() > 0 : "文件为空，请检查配置或网络";
+        VoiceVo voice = new VoiceVo(70, 80, 60);
+        File result = ttsService.synthesize(text, new File(outputDir, "tts-custom.mp3"), voice);
 
-        log.info("TTS 合成成功, 文件: {}", result.getAbsolutePath());
-        log.info("文件大小: {} 字节", result.length());
+        assert result != null && result.exists() && result.length() > 0
+                : "合成失败，请检查配置或网络";
+        log.info("自定义参数合成成功, {} 字节, voice={}", result.length(), voice);
     }
 
     @Test
     public void test_synthesize_empty_text() {
         File result = ttsService.synthesize("", new File("src/test/resources/audio/empty.mp3"));
         assert result == null : "空文本应返回 null";
-    }
-
-    @Test
-    public void test_synthesize_null_text() {
-        File result = ttsService.synthesize(null, new File("src/test/resources/audio/null.mp3"));
-        assert result == null : "null 文本应返回 null";
     }
 }

@@ -21,7 +21,7 @@ public class IflytekProperties {
     /** 讯飞 APISecret */
     private String apiSecret;
     /** TTS 发音人: xiaoyan(默认), xiaofeng, catherine 等 */
-    private String voiceName = "xiaoyan";
+    private String voiceName = "luna";
     /** TTS 语速 0-100 */
     private String speed = "50";
     /** TTS 音量 0-100 */
