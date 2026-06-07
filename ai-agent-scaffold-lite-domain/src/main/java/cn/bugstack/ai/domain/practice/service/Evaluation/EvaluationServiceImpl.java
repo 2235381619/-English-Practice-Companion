@@ -1,10 +1,13 @@
 package cn.bugstack.ai.domain.practice.service.Evaluation;
 
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
+import cn.bugstack.ai.domain.practice.model.valobj.IseResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import cn.bugstack.ai.domain.practice.service.IIseService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -19,6 +22,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class EvaluationServiceImpl implements IEvaluationService {
 
     private static final String EVAL_SYSTEM_PROMPT = """
@@ -42,8 +46,11 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Resource(name = "evalChatMemory")
     private ChatMemory chatMemory;
 
+    @Resource
+    private IIseService iseService;
+
     @Override
-    public EvaluationResult evaluate(String sessionId, String userText, Scenario scenario) {
+    public EvaluationResult evaluate(String sessionId, String userText, Scenario scenario, byte[] audioData) {
         log.info("GPT evaluate request: {}", userText);
         try {
             String systemText = EVAL_SYSTEM_PROMPT.replace("{scenarioPrompt}", scenario.getSystemPrompt());
@@ -54,7 +61,24 @@ public class EvaluationServiceImpl implements IEvaluationService {
             Prompt prompt = new Prompt(messages);
             String response = evalChatModel.call(prompt).getResult().getOutput().getText();
             chatMemory.add(sessionId, new AssistantMessage(response));
-            return parseEvaluation(response, userText);
+            EvaluationResult result = parseEvaluation(response, userText);
+            // ISE 发音评测
+            if (audioData != null && audioData.length >= 64) {
+                try {
+                    IseResult ise = iseService.evaluate(audioData, userText);
+                    result = result.toBuilder()
+                            .iseTotalScore(ise.getTotalScore())
+                            .iseAccuracyScore(ise.getAccuracyScore())
+                            .iseFluencyScore(ise.getFluencyScore())
+                            .iseIntegrityScore(ise.getIntegrityScore())
+                            .build();
+                    log.info("ISE completed: total={}, accuracy={}, fluency={}, integrity={}",
+                            ise.getTotalScore(), ise.getAccuracyScore(), ise.getFluencyScore(), ise.getIntegrityScore());
+                } catch (Exception e) {
+                    log.warn("ISE evaluation failed: {}", e.getMessage());
+                }
+            }
+            return result;
         } catch (Exception e) {
             log.warn("Evaluation failed, falling back: {}", e.getMessage());
             return fallbackEvaluation(userText, scenario);
@@ -99,7 +123,8 @@ private EvaluationResult parseEvaluation(String json, String originalText) {
         } catch (Exception e) {
             log.warn("Parse failed: {}", e.getMessage());
             return EvaluationResult.builder().originalText(originalText)
-                    .correctedText(originalText).score(5)
+                    .correctedText(originalText)
+                    .score(5)
                     .aiReply(json.length() > 200 ? json.substring(0, 200) : json).build();
         }
     }

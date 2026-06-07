@@ -96,9 +96,10 @@ WebSocket 场景语音参数固定用默认值 50/50/50。
 
 ---
 
+
 ## 5. 异步评测结果
 
-评测不阻塞对话。WebSocket 场景下有结果时推送：
+评测不阻塞对话。WebSocket 场景下有结果时异步推送：
 
 ```json
 {
@@ -109,6 +110,33 @@ WebSocket 场景语音参数固定用默认值 50/50/50。
   "score": 7
 }
 ```
+
+**ISE 发音评测分数**（推送时一同携带）：
+
+```json
+{
+  "type": "evaluation",
+  "correctedText": "Hello! I'm fine.",
+  "grammarIssues": ["Missing subject"],
+  "suggestions": ["Try starting with a greeting"],
+  "score": 7,
+  "iseTotalScore": 75.5,
+  "iseAccuracyScore": 68.2,
+  "iseFluencyScore": 82.1,
+  "iseIntegrityScore": 70.0
+}
+```
+
+| 字段 | 说明 | 范围 |
+|------|------|------|
+| `iseTotalScore` | 发音总分 | 0-100 |
+| `iseAccuracyScore` | 准确度评分 | 0-100 |
+| `iseFluencyScore` | 流利度评分 | 0-100 |
+| `iseIntegrityScore` | 完整度评分 | 0-100 |
+
+**前端需要处理：** 收到 `type: "evaluation"` 消息后，提取四项 ISE 分数展示。
+
+[ ] **前端待办：** WebSocket 收到 `type: "evaluation"` 后解析 `iseTotalScore` / `iseAccuracyScore` / `iseFluencyScore` / `iseIntegrityScore`，在界面上用雷达图展示发音四个维度的评分。
 
 HTTP 场景请轮询报告接口获取评测数据。
 
@@ -135,3 +163,11 @@ GET /api/v1/practice/session/{sessionId}/export
 ```javascript
 window.open("/api/v1/practice/session/abc-123/export")
 ```
+
+---
+
+## 8. 发音评测 ISE 雷达图
+
+[ ] **前端待办：** 对话结束后，在总结页面展示发音评测的 ISE 雷达图（总分、准确度、流利度、完整度四项）。
+
+

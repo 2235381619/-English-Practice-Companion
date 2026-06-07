@@ -113,7 +113,8 @@ public class IseServiceImpl implements IIseService {
         } catch (Exception ignored) {}
 
         java.util.Set<String> seen = new java.util.HashSet<>();
-        Pattern pattern = Pattern.compile("(\\w+_score)=\\"([\\d.]+)\"");
+        // 匹配格式：xxx_score="123.45"
+        Pattern pattern = Pattern.compile("(\\w+_score)=\"([\\d.]+)\"");
         Matcher matcher = pattern.matcher(raw);
         while (matcher.find()) {
             String tag = matcher.group(1);

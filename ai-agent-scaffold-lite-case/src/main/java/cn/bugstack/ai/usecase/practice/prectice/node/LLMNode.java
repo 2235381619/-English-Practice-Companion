@@ -7,8 +7,6 @@ import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
-import cn.bugstack.ai.domain.practice.model.valobj.IseResult;
-import cn.bugstack.ai.domain.practice.service.IIseService;
 import cn.bugstack.ai.usecase.practice.prectice.AbstractPracticeServiceSupport;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
@@ -52,7 +50,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
             log.info("Async eval starting: sessionId={}", sessionId);
             try {
                 Scenario scenario = Scenario.fromCode(scenarioCode);
-                EvaluationResult eval = evaluationService.evaluate(sessionId, asrText, scenario);
+                EvaluationResult eval = evaluationService.evaluate(sessionId, asrText, scenario, ctx.getAudioBytes());
                 log.info("Async eval completed: sessionId={}, score={}", sessionId, eval.getScore());
                 EvaluationResultPublisher.publish(sessionId, eval);
                 log.info("Async eval published: sessionId={}", sessionId);
@@ -71,6 +69,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         return ttsNode;
     }
 }
+
 
 
 

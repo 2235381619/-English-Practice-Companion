@@ -6,6 +6,7 @@ import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -35,6 +36,14 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
 
     public PracticeAudioWebSocketHandler(DefaultPracticeFactory practiceFactory) {
         this.practiceFactory = practiceFactory;
+    }
+
+
+
+    @PostConstruct
+    public void init() {
+        EvaluationResultPublisher.setCallback(PracticeAudioWebSocketHandler::sendEvalResult);
+        log.info("Evaluation callback registered");
     }
 
     @Override
@@ -106,6 +115,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
 
             DefaultPracticeFactory.DynamicContext ctx = new DefaultPracticeFactory.DynamicContext();
             ctx.setSessionId(sessionId);
+            ctx.setScenarioCode(scenarioCode);
 
             StrategyHandler<HandlePracticeMessageCommandEntity, DefaultPracticeFactory.DynamicContext, PracticeResult> handler =
                     practiceFactory.strategyHandler();
@@ -211,11 +221,11 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                 json.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
                 json.put("suggestions", eval.getSuggestions() != null ? eval.getSuggestions() : new java.util.ArrayList());
                 json.put("score", eval.getScore());
-            json.put("iseTotalScore", eval.getIseTotalScore());
-            json.put("iseAccuracyScore", eval.getIseAccuracyScore());
-            json.put("iseFluencyScore", eval.getIseFluencyScore());
-            json.put("iseIntegrityScore", eval.getIseIntegrityScore());
-                session.sendMessage(new TextMessage(json.toJSONString()));
+                 json.put("iseTotalScore", eval.getIseTotalScore());
+                 json.put("iseAccuracyScore", eval.getIseAccuracyScore());
+                 json.put("iseFluencyScore", eval.getIseFluencyScore());
+                 json.put("iseIntegrityScore", eval.getIseIntegrityScore());
+                 session.sendMessage(new TextMessage(json.toJSONString()));
             } catch (Exception e) {
                 log.warn("Send eval result failed: sessionId={}", sessionId, e);
             }

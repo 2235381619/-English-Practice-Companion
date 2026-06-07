@@ -33,8 +33,6 @@ public class EvaluationResult {
 
     /** AI 的自然回复 */
     private String aiReply;
-}
-
     /** ISE 发音总分 */
     private Double iseTotalScore;
     /** ISE 准确度分 */
@@ -43,5 +41,8 @@ public class EvaluationResult {
     private Double iseFluencyScore;
     /** ISE 完整度分 */
     private Double iseIntegrityScore;
+}
+
+
 
 

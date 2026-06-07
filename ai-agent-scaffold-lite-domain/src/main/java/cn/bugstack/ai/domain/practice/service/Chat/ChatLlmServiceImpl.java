@@ -26,10 +26,10 @@ public class ChatLlmServiceImpl implements IChatLlmService {
     private static final String CHAT_TEMPLATE = "{systemPrompt}\n\nUser: {userText}\nAssistant:";
 
     private static final java.util.Map<String, String> SCENARIO_PROMPTS = java.util.Map.of(
-        "default", "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences). Just have a natural conversation.",
-        "interview", "You are a senior tech interviewer. Ask interview questions, evaluate answers, and provide feedback. Keep responses concise (1-3 sentences).",
-        "restaurant", "You are a waiter at a restaurant. Take orders, answer questions about the menu, and make small talk. Keep responses concise (1-3 sentences).",
-        "meeting", "You are a business professional in a meeting. Discuss topics professionally, ask questions, and provide feedback. Keep responses concise (1-3 sentences)."
+            "default", "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences). Just have a natural conversation. Reply in English.",
+            "interview", "You are a senior tech interviewer. Ask one interview question at a time, evaluate the answer, and give brief feedback. Keep responses to 1-3 sentences. Reply in English.",
+            "restaurant", "You are a waiter at a restaurant. Greet the customer, take orders, answer menu questions, and make small talk. Keep responses to 1-3 sentences. Reply in English.",
+            "meeting", "You are a business professional in a meeting. Discuss topics professionally, ask relevant questions, and provide constructive feedback. Keep responses to 1-3 sentences. Reply in English."
     );
 
     @Resource(name = "practiceChatModel")

@@ -27,13 +27,13 @@ public class IseServiceTest {
 
     @Test
     public void test_evaluate_pronunciation() throws Exception {
-        File audioFile = new File("src/test/resources/audio/ise-test-input.pcm");
+        File audioFile = new File("src/test/resources/audio/tts-custom.mp3");
         assert audioFile.exists() : "音频文件不存在";
 
         byte[] audioData = Files.readAllBytes(audioFile.toPath());
         assert audioData.length > 64 : "音频数据太短";
 
-        String referenceText = "Let me introduce myself to you";
+        String referenceText = "hello everyone welcome to speech sentence test";
         log.info("ISE 开始：audio={}B, text=\"{}\"", audioData.length, referenceText);
 
         IseResult result = iseService.evaluate(audioData, referenceText);

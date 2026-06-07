@@ -8,7 +8,7 @@ import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
  */
 public interface IEvaluationService {
 
-    EvaluationResult evaluate(String sessionId, String userText, Scenario scenario);
+    EvaluationResult evaluate(String sessionId, String userText, Scenario scenario, byte[] audioData);
 
     EvaluationResult simpleReply(String userText, Scenario scenario);
 }
