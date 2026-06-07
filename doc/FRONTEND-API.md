@@ -1,45 +1,34 @@
 # 口语练习 API — 前端接入说明
 
-## 待办清单
+## 接口列表
 
-- [x] **场景注册** — 对话前先调 `POST /api/v1/practice/scenario` 注册场景
-- [x] **`voice` 字段** — 请求体已支持 `voice.speed/volume/pitch`
-- [x] **`audioData` 播放** — 响应里 base64 音频，前端 `new Audio("data:audio/mp3;base64," + data.audioData).play()`
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/v1/practice/scenario/{sessionId}/{scenarioCode}` | 注册场景 |
+| POST | `/api/v1/practice/text` | 文本对话 |
+| POST | `/api/v1/practice/session` | 音频对话 |
+| GET  | `/api/v1/practice/session/{sessionId}/report` | 会话报告 |
+| GET  | `/api/v1/practice/session/{sessionId}/export` | 导出会话记录 |
 
 ---
 
 ## 1. 注册场景（对话前先调用）
 
-用户在界面上选择场景后，先调这个接口，后端注册该会话的系统提示词。
-
 ```
-POST /api/v1/practice/scenario
+POST /api/v1/practice/scenario/{sessionId}/{scenarioCode}
 ```
 
-```json
-{
-  "sessionId": "abc-123",
-  "scenarioCode": "interview"
-}
+无需请求体，路径里直接传 sessionId 和场景名。
+
+场景值：`interview` / `restaurant` / `meeting` / `default`
+
+```javascript
+fetch("/api/v1/practice/scenario/abc-123/interview", { method: "POST" })
 ```
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `sessionId` | string | 是 | 会话 ID |
-| `scenarioCode` | string | 是 | `interview` / `restaurant` / `meeting` / `default` |
-
-```json
-{
-  "code": "0000",
-  "info": "success"
-}
-```
-
-> 选完场景到开始说话有自然时间间隔，注册瞬间完成，不用担心延迟。
 
 ---
 
-## 2. 发送文本对话
+## 2. 文本对话
 
 ```
 POST /api/v1/practice/text
@@ -62,35 +51,34 @@ POST /api/v1/practice/text
 | `voice.volume` | int | 否 | 音量 0-100，默认 50 |
 | `voice.pitch` | int | 否 | 音高 0-100，默认 50 |
 
-> 注意：`scenarioCode` 不用再传了，已在注册场景时设定好。
+响应：
 
 ```json
 {
   "code": "0000",
   "data": {
     "asrText":   "hello hello",
-    "replyText": "Hello! I'm ready to begin...",
+    "replyText": "Hello! I'm ready...",
     "audioData": "//UZRAAAAW252Y..."
   }
 }
 ```
 
-前端拿到 `audioData` 后直接播放：
+播放音频：
 
 ```javascript
-const audio = new Audio("data:audio/mp3;base64," + result.data.audioData);
-audio.play();
+new Audio("data:audio/mp3;base64," + result.data.audioData).play()
 ```
 
 ---
 
-## 3. 发送音频对话
+## 3. 音频对话
 
 ```
 POST /api/v1/practice/session
 ```
 
-请求体与文本接口相同，区别是后端会先做 ASR 语音识别再回复。
+请求体与文本接口相同，后端先做 ASR 语音识别再回复。
 
 ---
 
@@ -110,7 +98,7 @@ WebSocket 场景语音参数固定用默认值 50/50/50。
 
 ## 5. 异步评测结果
 
-评测已改为异步，不阻塞回复流程。若通过 WebSocket 连接，评测完成后会推送消息：
+评测不阻塞对话。WebSocket 场景下有结果时推送：
 
 ```json
 {
@@ -122,12 +110,28 @@ WebSocket 场景语音参数固定用默认值 50/50/50。
 }
 ```
 
-前端收到后更新界面上的评测区域即可。
+HTTP 场景请轮询报告接口获取评测数据。
 
 ---
 
-## 6. 获取会话报告
+## 6. 会话报告
 
 ```
 GET /api/v1/practice/session/{sessionId}/report
+```
+
+返回评测数据和轮次列表。
+
+---
+
+## 7. 导出会话记录
+
+```
+GET /api/v1/practice/session/{sessionId}/export
+```
+
+下载 `.txt` 文件，包含全部对话轮次 + 评测数据。
+
+```javascript
+window.open("/api/v1/practice/session/abc-123/export")
 ```
