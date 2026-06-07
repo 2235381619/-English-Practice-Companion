@@ -29,7 +29,13 @@ public class TTSNode extends AbstractPracticeServiceSupport {
     private ITtsService ttsService;
 
     @Value("${audio.output.dir:./audio}")
-    private String audioOutputDir;
+        private String audioOutputDir;
+
+    @Value("${server.port:8091}")
+    private String serverPort;
+
+    @Value("${audio.base-url:}")
+    private String audioBaseUrl;
 
     @Override
     protected PracticeResult doApply(HandlePracticeMessageCommandEntity requestParameter,
@@ -49,7 +55,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         }
 
         // TTS 合成
-        byte[] audio = ttsService.synthesize(replyText, voice);
+        byte[] audio = ttsService.synthesize(stripMarkdown(replyText), voice);
         if (audio.length == 0) {
             log.warn("TTSNode: synthesize returned empty, sessionId={}", requestParameter.getSessionId());
             dynamicContext.setSuccess(false);
@@ -57,7 +63,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         }
 
         // 保存音频文件
-        String audioFileName = requestParameter.getSessionId() + ".mp3";
+        String audioFileName = requestParameter.getSessionId() + "_" + System.currentTimeMillis() + ".mp3";
         File audioDir = new File(audioOutputDir);
         if (!audioDir.exists()) {
             audioDir.mkdirs();
@@ -65,7 +71,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         File audioFile = new File(audioDir, audioFileName);
         Files.write(audioFile.toPath(), audio);
 
-        String audioUrl = "/audio/" + audioFileName;
+        String audioUrl = (audioBaseUrl.isEmpty() ? "http://localhost:" + serverPort : audioBaseUrl) + "/audio/" + audioFileName;
         dynamicContext.setAudioUrl(audioUrl);
         dynamicContext.setSuccess(true);
 
@@ -90,4 +96,24 @@ public class TTSNode extends AbstractPracticeServiceSupport {
             DefaultPracticeFactory.DynamicContext dynamicContext) throws Exception {
         return defaultStrategyHandler;
     }
+    /**
+     * 去除文本中的 Markdown 符号，防止 TTS 朗读 ** ` 等标记
+     */
+    private static String stripMarkdown(String text) {
+        if (text == null) return "";
+        // **bold** → bold
+        text = text.replaceAll("\\*\\*(.+?)\\*\\*", "$1");
+        // `code` → code
+        text = text.replaceAll("`([^`]+)`", "$1");
+        // ~~strikethrough~~ → strikethrough
+        text = text.replaceAll("~~(.+?)~~", "$1");
+        // [text](url) → text
+        text = text.replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1");
+        // # headers → strip leading #
+        text = text.replaceAll("(?m)^#+\\s*", "");
+        // - / * list markers → strip
+        text = text.replaceAll("(?m)^[-*]\\s+", "");
+        return text.trim();
+    }
+
 }
