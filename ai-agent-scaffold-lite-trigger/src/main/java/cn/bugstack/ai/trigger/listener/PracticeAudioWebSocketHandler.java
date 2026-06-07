@@ -82,9 +82,17 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
             if (text.startsWith("{")) {
                 // JSON config message: { "type": "config", "scenarioCode": "interview" }
                 try {
-                    String scenarioCode = com.alibaba.fastjson.JSON.parseObject(text).getString("scenarioCode");
+                    com.alibaba.fastjson.JSONObject cfg = com.alibaba.fastjson.JSON.parseObject(text);
+                    String scenarioCode = cfg.getString("scenarioCode");
                     if (scenarioCode == null || scenarioCode.isBlank()) scenarioCode = "default";
                     sessionScenarios.put(sessionId, scenarioCode);
+
+                    // 解析语音参数
+                    java.util.Map<String, Integer> voice = new java.util.HashMap<>();
+                    if (cfg.containsKey("speed")) voice.put("speed", cfg.getInteger("speed"));
+                    if (cfg.containsKey("volume")) voice.put("volume", cfg.getInteger("volume"));
+                    if (cfg.containsKey("pitch")) voice.put("pitch", cfg.getInteger("pitch"));
+                    if (!voice.isEmpty()) sessionVoices.put(sessionId, voice);
                     log.info("Practice WS config: sessionId={}, scenario={}", sessionId, scenarioCode);
                 } catch (Exception e) {
                     log.warn("Failed to parse config JSON: {}", e.getMessage());
@@ -111,12 +119,19 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
 
         try {
             String scenarioCode = sessionScenarios.getOrDefault(sessionId, "default");
-            HandlePracticeMessageCommandEntity req = HandlePracticeMessageCommandEntity.builder()
+            HandlePracticeMessageCommandEntity.HandlePracticeMessageCommandEntityBuilder reqBuilder = HandlePracticeMessageCommandEntity.builder()
                     .sessionId(sessionId)
                     .inputType(1)
-                    .audioData(audioData)
-
-                    .build();
+                    .audioData(audioData);
+                    // 应用语音参数
+                    java.util.Map<String, Integer> v = sessionVoices.get(sessionId);
+                    if (v != null) {
+                        reqBuilder.voice(new cn.bugstack.ai.domain.practice.model.valobj.VoiceVo(
+                                v.getOrDefault("speed", 50),
+                                v.getOrDefault("volume", 50),
+                                v.getOrDefault("pitch", 50)));
+                    }
+                    HandlePracticeMessageCommandEntity req = reqBuilder.build();
 
             DefaultPracticeFactory.DynamicContext ctx = new DefaultPracticeFactory.DynamicContext();
             ctx.setSessionId(sessionId);

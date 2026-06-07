@@ -52,9 +52,8 @@ function initVoiceSettings() {
       valSpan.textContent = slider.value;
       voiceSettings[param] = parseInt(slider.value, 10);
     };
-    slider.onchange = function() {
-      slider.disabled = true;
-      voiceLocked[param] = true;
+    slider.oninput = function() {
+      valSpan.textContent = slider.value;
       voiceSettings[param] = parseInt(slider.value, 10);
     };
   });
@@ -91,7 +90,7 @@ function startRecording() {
   try {
     var ws = new WebSocket(WS_BASE + "/" + sessionId);
     ws.binaryType = "arraybuffer";
-    ws.onopen = function() { ws.send(JSON.stringify({ type: "config" })); };
+    ws.onopen = function() { ws.send(JSON.stringify({ type: "config", scenarioCode: selectedScenario, speed: voiceSettings.speed, volume: voiceSettings.volume, pitch: voiceSettings.pitch })); };
     var _evalTimer = null;
     ws.onmessage = function(ev) {
       if (typeof ev.data === "string") { try { var d = JSON.parse(ev.data); if (d.type === "evaluation") { if (_evalTimer) { clearTimeout(_evalTimer); _evalTimer = null; } handleEvaluation(d); if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; } } else { handleResult(d); _evalTimer = setTimeout(function() { if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; } }, 12000); } } catch(e) {} }
@@ -177,7 +176,7 @@ function sendPracticeText() {
   fetch(PRACTICE_API + "/text", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId: sessionId, text: text })
+    body: JSON.stringify({ sessionId: sessionId, text: text, voice: voiceSettings })
   }).then(function(r) { return r.json(); }).then(function(json) {
     if (json.code === "0000" && json.data) handleResult(json.data);
   }).catch(function(e) { console.warn(e); });
