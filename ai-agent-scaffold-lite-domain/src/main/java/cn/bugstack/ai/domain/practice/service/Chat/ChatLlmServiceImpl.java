@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.ai.chat.client.ChatClient;
 
 @Slf4j
 @Service
@@ -35,15 +36,29 @@ public class ChatLlmServiceImpl implements IChatLlmService {
 
 
     @Override
-    public String getSessionPrompt(String sessionId) {
-        return sessionPrompts.get(sessionId);
+    public String chatBySession(String userText, String sessionId) {
+        ChatClient client = sessionClients.get(sessionId);
+        if (client == null) {
+            return chat(userText, "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences).");
+        }
+        try {
+            String reply = client.prompt().user(userText).call().content();
+            log.info("ChatLlm: len={} -> len={}", userText.length(), reply != null ? reply.length() : 0);
+            return reply != null ? reply.trim() : "";
+        } catch (Exception e) {
+            log.error("ChatLlm failed: {}", e.getMessage());
+            return "Sorry, I'm having trouble responding.";
+        }
     }
 
     @Override
     public void chatRegister(String sessionId, String scenarioCode) {
         String scenario = scenarioCode != null ? scenarioCode : "default";
         String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
-        sessionPrompts.put(sessionId, prompt);
+        ChatClient client = ChatClient.builder(chatModel)
+                .defaultSystem(prompt)
+                .build();
+        sessionClients.put(sessionId, client);
         log.info("Scenario registered: sessionId={}, scenario={}", sessionId, scenario);
     }
 
