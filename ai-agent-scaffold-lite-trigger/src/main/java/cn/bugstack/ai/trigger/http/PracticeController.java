@@ -1,12 +1,13 @@
 package cn.bugstack.ai.trigger.http;
 
 import cn.bugstack.ai.api.response.Response;
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler;
 import java.util.List;
 import java.util.Map;
 import cn.bugstack.ai.types.enums.ResponseCode;
+import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.usecase.practice.IPracticeService2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +67,26 @@ public class PracticeController {
         } catch (Exception e) {
             log.error("Submit audio failed", e);
             return Response.<PracticeResult>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(e.getMessage())
+                    .build();
+        }
+    }
+
+    @PostMapping("scenario")
+    public Response<Void> registerScenario(@RequestBody HandlePracticeMessageCommandEntity request) {
+        try {
+            String scenario = request.getScenarioCode() != null ? request.getScenarioCode() : "default";
+            String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
+            chatLlmService.registerSession(request.getSessionId(), prompt);
+            log.info("Scenario registered: sessionId={}, scenario={}", request.getSessionId(), scenario);
+            return Response.<Void>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .build();
+        } catch (Exception e) {
+            log.error("Register scenario failed", e);
+            return Response.<Void>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(e.getMessage())
                     .build();

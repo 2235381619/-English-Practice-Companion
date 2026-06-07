@@ -9,6 +9,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -23,6 +24,17 @@ public class ChatLlmServiceImpl implements IChatLlmService {
     @Override
     public String chat(String userText) {
         return chat(userText, "You are a friendly English conversation partner. Respond naturally and concisely.");
+    }
+
+    @Override
+    public void registerSession(String sessionId, String systemPrompt) {
+        sessionPrompts.put(sessionId, systemPrompt);
+        log.info("Session registered: sessionId={}", sessionId);
+    }
+
+    @Override
+    public String getSessionPrompt(String sessionId) {
+        return sessionPrompts.get(sessionId);
     }
 
     @Override

@@ -40,7 +40,11 @@ public class LLMNode extends AbstractPracticeServiceSupport {
             return router(req, ctx);
         }
 
-        String reply = chatLlmService.chat(asrText, ctx.getSystemPrompt());
+        String prompt = chatLlmService.getSessionPrompt(req.getSessionId());
+        if (prompt == null || prompt.isBlank()) {
+            prompt = "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences).";
+        }
+        String reply = chatLlmService.chat(asrText, prompt);
         ctx.setReplyText(reply);
 
         // 异步评测，不阻塞 TTS 合成
