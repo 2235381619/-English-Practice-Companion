@@ -60,6 +60,15 @@ function initVoiceSettings() {
   });
 }
 
+
+function registerScenario(sessionId, code) {
+  fetch(PRACTICE_API + "/scenario", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId: sessionId, scenarioCode: code })
+  }).catch(function(e) { console.warn("Scenario registration failed:", e); });
+}
+
 function selectScenario(code) {
   selectedScenario = code;
   var labels = { "default":"Free Chat", "interview":"Interview", "restaurant":"Restaurant", "meeting":"Meeting" };
@@ -68,6 +77,8 @@ function selectScenario(code) {
   document.getElementById("practiceSession").style.display = "flex";
   document.getElementById("practiceInput").style.display = "block";
   document.getElementById("practiceEndBtn").style.display = "block";
+  registerScenario(sessionId, code);
+  initVoiceSettings();
   updateUI();
 }
 
@@ -83,7 +94,7 @@ function startRecording() {
     ws.binaryType = "arraybuffer";
     ws.onopen = function() { ws.send(JSON.stringify({ type: "config", scenarioCode: selectedScenario || "default" })); };
     ws.onmessage = function(ev) {
-      if (typeof ev.data === "string") { try { handleResult(JSON.parse(ev.data)); } catch(e) {} }
+      if (typeof ev.data === "string") { try { var d = JSON.parse(ev.data); if (d.type === "evaluation") { handleEvaluation(d); } else { handleResult(d); } } catch(e) {} }
     };
     ws.onerror = function() {};
     ws.onclose = function() { if (mode === "recording") stopRecording(); };
@@ -167,7 +178,7 @@ function sendPracticeText() {
   fetch(PRACTICE_API + "/text", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(function(){var b={sessionId:sessionId,text:text,scenarioCode:selectedScenario||"default"};if(voiceLocked.speed||voiceLocked.volume||voiceLocked.pitch){b.voice={speed:voiceSettings.speed,volume:voiceSettings.volume,pitch:voiceSettings.pitch}}return b}())
+    body: JSON.stringify(function(){var b={sessionId:sessionId,text:text};if(voiceLocked.speed||voiceLocked.volume||voiceLocked.pitch){b.voice={speed:voiceSettings.speed,volume:voiceSettings.volume,pitch:voiceSettings.pitch}}return b}())
   }).then(function(r) { return r.json(); }).then(function(json) {
     if (json.code === "0000" && json.data) handleResult(json.data);
   }).catch(function(e) { console.warn(e); });
@@ -180,13 +191,27 @@ function handleResult(data) {
     messages.push({ role: "assistant", content: reply, correctedText: data.correctedText || "", grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || [], score: data.score || 0 });
     renderMessages();
   }
-  if (data.audioUrl) {
-    new Audio(data.audioUrl).play().catch(function(e) { console.warn('Audio playback failed:', e); });
+  if (data.audioData) {
+    new Audio("data:audio/mp3;base64," + data.audioData).play().catch(function(e) { console.warn("Audio playback failed:", e); });
   }
   mode = "idle";
   if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";
   updateUI();
+}
+
+
+function handleEvaluation(data) {
+  if (messages.length > 0) {
+    var last = messages[messages.length - 1];
+    if (last.role === "assistant") {
+      if (data.correctedText) last.correctedText = data.correctedText;
+      if (data.grammarIssues) last.grammarIssues = data.grammarIssues;
+      if (data.suggestions) last.suggestions = data.suggestions;
+      if (data.score) last.score = data.score;
+      renderMessages();
+    }
+  }
 }
 
 function addMessage(role, content) { messages.push({ role: role, content: content }); renderMessages(); }
