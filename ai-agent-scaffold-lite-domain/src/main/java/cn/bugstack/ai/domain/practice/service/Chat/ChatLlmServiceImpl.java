@@ -17,6 +17,13 @@ public class ChatLlmServiceImpl implements IChatLlmService {
 
     private static final String CHAT_TEMPLATE = "{systemPrompt}\n\nUser: {userText}\nAssistant:";
 
+    private static final java.util.Map<String, String> SCENARIO_PROMPTS = java.util.Map.of(
+        "default", "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences). Just have a natural conversation.",
+        "interview", "You are a senior tech interviewer. Ask interview questions, evaluate answers, and provide feedback. Keep responses concise (1-3 sentences).",
+        "restaurant", "You are a waiter at a restaurant. Take orders, answer questions about the menu, and make small talk. Keep responses concise (1-3 sentences).",
+        "meeting", "You are a business professional in a meeting. Discuss topics professionally, ask questions, and provide feedback. Keep responses concise (1-3 sentences)."
+    );
+
     @Resource(name = "practiceChatModel")
     private ChatModel chatModel;
 
@@ -35,6 +42,13 @@ public class ChatLlmServiceImpl implements IChatLlmService {
     @Override
     public String getSessionPrompt(String sessionId) {
         return sessionPrompts.get(sessionId);
+    }
+
+    @Override
+    public void chatRegister(String sessionId, String scenarioCode) {
+        String scenario = scenarioCode != null ? scenarioCode : "default";
+        String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
+        registerSession(sessionId, prompt);
     }
 
     @Override

@@ -76,10 +76,8 @@ public class PracticeController {
     @PostMapping("scenario")
     public Response<Void> registerScenario(@RequestBody HandlePracticeMessageCommandEntity request) {
         try {
-            String scenario = request.getScenarioCode() != null ? request.getScenarioCode() : "default";
-            String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
-            chatLlmService.registerSession(request.getSessionId(), prompt);
-            log.info("Scenario registered: sessionId={}, scenario={}", request.getSessionId(), scenario);
+            chatLlmService.chatRegister(request.getSessionId(), request.getScenarioCode());
+            log.info("Scenario registered: sessionId={}, scenario={}", request.getSessionId(), request.getScenarioCode());
             return Response.<Void>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
