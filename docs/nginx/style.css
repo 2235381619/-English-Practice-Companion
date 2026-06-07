@@ -866,3 +866,157 @@ input, textarea {
 .eval-suggestion { color: #6366f1; }
 .eval-score { margin-top: 4px; color: #f59e0b; font-weight: 600; }
 .pmsg-text.reply { color: #1e293b; font-weight: 500; }
+
+
+
+
+
+.voice-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.voice-slider-row:last-child {
+  margin-bottom: 0;
+}
+
+.voice-slider-row label {
+  width: 48px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.voice-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  outline: none;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.voice-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+}
+
+.voice-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: grab;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  margin-top: -6px;
+  transition: box-shadow 0.15s;
+}
+
+.voice-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+
+.voice-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.voice-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  border: none;
+}
+
+.voice-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: grab;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.voice-slider:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.voice-slider:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+  background: var(--color-text-tertiary);
+  box-shadow: none;
+}
+
+.voice-slider:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+  background: var(--color-text-tertiary);
+  box-shadow: none;
+}
+
+.voice-slider-value {
+  width: 28px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   Practice Panel — Right Sidebar Feature Zone
+   ============================================ */
+
+.practice-panel {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--color-border);
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--color-bg);
+}
+
+.practice-panel-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+/* Voice sliders inside the panel — vertical layout */
+.practice-panel .voice-slider-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.practice-panel .voice-slider-row:last-child {
+  margin-bottom: 0;
+}
+
+.practice-panel .voice-slider-row label {
+  width: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.practice-panel .voice-slider-row .voice-slider-value {
+  align-self: flex-end;
+  margin-top: -16px;
+}

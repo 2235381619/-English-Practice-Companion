@@ -7,6 +7,10 @@ let mode = "idle";
 let messages = [];
 let selectedScenario = null;
 
+// Voice settings state
+let voiceSettings = { speed: 50, volume: 50, pitch: 50 };
+let voiceLocked = { speed: false, volume: false, pitch: false };
+
 let rec = { stream: null, ctx: null, source: null, analyser: null, processor: null, ws: null, rafId: null, canvasCtx: null };
 
 function initPractice() {
@@ -17,6 +21,8 @@ function initPractice() {
   document.getElementById("practiceSession").style.display = "none";
   document.getElementById("practiceInput").style.display = "none";
   document.getElementById("practiceEndBtn").style.display = "none";
+  voiceSettings = { speed: 50, volume: 50, pitch: 50 };
+  voiceLocked = { speed: false, volume: false, pitch: false };
   var cards = document.getElementById("scenarioCards");
   if (cards) {
     cards.innerHTML =
@@ -25,7 +31,33 @@ function initPractice() {
       "<div class=\"scenario-card\" onclick=\"selectScenario('restaurant')\"><div class=\"scenario-card-icon\">&#x1F37D;</div><div class=\"scenario-card-name\">Restaurant</div><div class=\"scenario-card-desc\">Ordering food</div></div>" +
       "<div class=\"scenario-card\" onclick=\"selectScenario('meeting')\"><div class=\"scenario-card-icon\">&#x1F4CB;</div><div class=\"scenario-card-name\">Meeting</div><div class=\"scenario-card-desc\">Business meeting</div></div>";
   }
+  initVoiceSettings();
   updateUI();
+}
+
+
+function initVoiceSettings() {
+  var params = ["speed", "volume", "pitch"];
+  params.forEach(function(param) {
+    var id = 'voice' + param.charAt(0).toUpperCase() + param.slice(1);
+    var slider = document.getElementById(id);
+    var valSpan = document.getElementById(id + 'Val');
+    if (!slider || !valSpan) return;
+    slider.value = 50;
+    valSpan.textContent = '50';
+    slider.disabled = false;
+    voiceSettings[param] = 50;
+    voiceLocked[param] = false;
+    slider.oninput = function() {
+      valSpan.textContent = slider.value;
+      voiceSettings[param] = parseInt(slider.value, 10);
+    };
+    slider.onchange = function() {
+      slider.disabled = true;
+      voiceLocked[param] = true;
+      voiceSettings[param] = parseInt(slider.value, 10);
+    };
+  });
 }
 
 function selectScenario(code) {
@@ -126,7 +158,7 @@ function toggleRecording() {
   if (mode === "idle") startRecording(); else if (mode === "recording") stopRecording();
 }
 
-function sendText() {
+function sendPracticeText() {
   var inp = document.getElementById("practiceTextInput");
   var text = inp.value.trim();
   if (!text || !sessionId || mode === "processing") return;
@@ -135,7 +167,7 @@ function sendText() {
   fetch(PRACTICE_API + "/text", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId: sessionId, text: text, scenarioCode: selectedScenario || "default" })
+    body: JSON.stringify(function(){var b={sessionId:sessionId,text:text,scenarioCode:selectedScenario||"default"};if(voiceLocked.speed||voiceLocked.volume||voiceLocked.pitch){b.voice={speed:voiceSettings.speed,volume:voiceSettings.volume,pitch:voiceSettings.pitch}}return b}())
   }).then(function(r) { return r.json(); }).then(function(json) {
     if (json.code === "0000" && json.data) handleResult(json.data);
   }).catch(function(e) { console.warn(e); });
@@ -226,6 +258,8 @@ function endPracticeSession() {
   document.getElementById("practiceSession").style.display = "none";
   document.getElementById("practiceInput").style.display = "none";
   document.getElementById("practiceEndBtn").style.display = "none";
+  voiceSettings = { speed: 50, volume: 50, pitch: 50 };
+  voiceLocked = { speed: false, volume: false, pitch: false };
   document.getElementById("practiceTitle").textContent = "AI Voice Chat";
 }
 

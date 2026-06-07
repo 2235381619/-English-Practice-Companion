@@ -94,7 +94,7 @@
         <p class="scenario-subtitle"></p>
       </div>
 
-      <div id="practiceSession" class="practice-session-content" style="display:none;">
+            <div id="practiceSession" class="practice-session-content" style="display:none;">
         <div class="practice-body">
           <div class="practice-conversation" id="practiceConversation">
             <div class="conversation-empty" id="conversationEmpty">
@@ -105,6 +105,26 @@
               <div class="streaming-dot"></div><div class="streaming-dot"></div><div class="streaming-dot"></div>
             </div>
           </div>
+          <div class="practice-panel" id="practicePanel">
+            <div class="practice-panel-section">
+              <div class="practice-panel-section-title">Voice</div>
+              <div class="voice-slider-row">
+                <label>Speed</label>
+                <input type="range" class="voice-slider" id="voiceSpeed" min="0" max="100" value="50">
+                <span class="voice-slider-value" id="voiceSpeedVal">50</span>
+              </div>
+              <div class="voice-slider-row">
+                <label>Volume</label>
+                <input type="range" class="voice-slider" id="voiceVolume" min="0" max="100" value="50">
+                <span class="voice-slider-value" id="voiceVolumeVal">50</span>
+              </div>
+              <div class="voice-slider-row">
+                <label>Pitch</label>
+                <input type="range" class="voice-slider" id="voicePitch" min="0" max="100" value="50">
+                <span class="voice-slider-value" id="voicePitchVal">50</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -112,7 +132,7 @@
         <canvas id="waveCanvas" style="width:100%;height:100%;display:block"></canvas>
       </div>
 
-      <div id="practiceInput" class="practice-input-area" style="display:none;">
+<div id="practiceInput" class="practice-input-area" style="display:none;">
         <div class="practice-input-row">
           <input id="practiceTextInput" class="practice-text-input" placeholder="Type your message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPracticeText()}"/>
           <button id="practiceMicBtn" class="practice-mic-btn" onclick="toggleRecording()" title="Start recording">
