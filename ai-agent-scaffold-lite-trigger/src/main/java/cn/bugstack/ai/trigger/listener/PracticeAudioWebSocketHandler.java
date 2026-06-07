@@ -101,7 +101,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                     .sessionId(sessionId)
                     .inputType(1)
                     .audioData(audioData)
-                    .scenarioCode(scenarioCode)
+
                     .build();
 
             DefaultPracticeFactory.DynamicContext ctx = new DefaultPracticeFactory.DynamicContext();

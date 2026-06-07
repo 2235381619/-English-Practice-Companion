@@ -16,7 +16,7 @@ public class HandlePracticeMessageCommandEntity {
     private Integer inputType;
     private byte[] audioData;
     private String text;
-    private String scenarioCode;
+
     /** 语音参数（speed/volume/pitch），可选 */
     private VoiceVo voice;
 }
