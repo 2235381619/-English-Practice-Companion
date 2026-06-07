@@ -24,7 +24,16 @@ public class EvaluationServiceImpl implements IEvaluationService {
     private static final String EVAL_SYSTEM_PROMPT = """
         You are a professional English tutor. Evaluate the user's latest speech.
         Scenario: {scenarioPrompt}
-        Respond with valid JSON only. Fields: correctedText, grammarIssues (array), suggestions (array), score (1-10), aiReply.
+
+        Respond with valid JSON only, no markdown.
+        Example:
+        {
+          "correctedText": "I went to the store yesterday.",
+          "grammarIssues": ["Wrong verb tense"],
+          "suggestions": ["Use past tense for completed actions"],
+          "score": 7,
+          "aiReply": "Good try! Remember to use past tense."
+        }
         """;
 
     @Resource(name = "evlChatModel")
