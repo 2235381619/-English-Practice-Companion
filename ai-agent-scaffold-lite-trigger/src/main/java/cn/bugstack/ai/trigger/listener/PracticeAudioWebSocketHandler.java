@@ -111,6 +111,12 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                     practiceFactory.strategyHandler();
             handler.apply(req, ctx);
 
+            // Save round for export
+            java.util.Map<String, Object> convRound = new java.util.HashMap<>();
+            convRound.put("asrText", ctx.getAsrText() != null ? ctx.getAsrText() : "");
+            convRound.put("replyText", ctx.getReplyText() != null ? ctx.getReplyText() : "");
+            saveRound(sessionId, convRound);
+
             com.alibaba.fastjson.JSONObject resp = new com.alibaba.fastjson.JSONObject();
             resp.put("asrText", ctx.getAsrText() != null ? ctx.getAsrText() : "");
             resp.put("replyText", ctx.getReplyText() != null ? ctx.getReplyText() : "");
@@ -211,3 +217,5 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
         }
     }
 }
+
+
