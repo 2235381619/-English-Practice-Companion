@@ -33,11 +33,6 @@ public class ChatLlmServiceImpl implements IChatLlmService {
         return chat(userText, "You are a friendly English conversation partner. Respond naturally and concisely.");
     }
 
-    @Override
-    public void registerSession(String sessionId, String systemPrompt) {
-        sessionPrompts.put(sessionId, systemPrompt);
-        log.info("Session registered: sessionId={}", sessionId);
-    }
 
     @Override
     public String getSessionPrompt(String sessionId) {
@@ -48,7 +43,8 @@ public class ChatLlmServiceImpl implements IChatLlmService {
     public void chatRegister(String sessionId, String scenarioCode) {
         String scenario = scenarioCode != null ? scenarioCode : "default";
         String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
-        registerSession(sessionId, prompt);
+        sessionPrompts.put(sessionId, prompt);
+        log.info("Scenario registered: sessionId={}, scenario={}", sessionId, scenario);
     }
 
     @Override
