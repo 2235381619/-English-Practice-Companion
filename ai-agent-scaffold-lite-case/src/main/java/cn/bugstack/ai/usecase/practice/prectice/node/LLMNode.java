@@ -7,6 +7,8 @@ import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import cn.bugstack.ai.domain.practice.service.Ise.IseResult;
+import cn.bugstack.ai.domain.practice.service.Ise.IseService;
 import cn.bugstack.ai.usecase.practice.prectice.AbstractPracticeServiceSupport;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
@@ -69,4 +71,5 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         return ttsNode;
     }
 }
+
 

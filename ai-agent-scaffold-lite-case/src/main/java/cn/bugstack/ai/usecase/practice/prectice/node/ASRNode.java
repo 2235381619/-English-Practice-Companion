@@ -28,6 +28,7 @@ public class ASRNode extends AbstractPracticeServiceSupport {
         long start = System.currentTimeMillis();
         String text = asrService.transcribe(requestParameter.getAudioData());
         dynamicContext.setAsrText(text);
+        dynamicContext.setAudioBytes(requestParameter.getAudioData());
         log.info("ASRNode: result=\"{}\", sessionId={}, cost={}ms", text, requestParameter.getSessionId(), System.currentTimeMillis() - start);
         return router(requestParameter, dynamicContext);
     }

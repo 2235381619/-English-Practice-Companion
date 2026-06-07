@@ -33,6 +33,7 @@ public class DefaultPracticeFactory {
         private int score;
         private String audioUrl;
         private String audioData;
+        private byte[] audioBytes;
         private boolean success;
         private String errorMsg;
     }

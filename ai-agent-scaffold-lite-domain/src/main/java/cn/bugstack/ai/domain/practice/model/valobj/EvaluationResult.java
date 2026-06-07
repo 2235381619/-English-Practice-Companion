@@ -11,7 +11,7 @@ import java.util.List;
  * 单轮评测结果 — 语法纠错 + 表达建议 + 评分
  */
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class EvaluationResult {
@@ -34,3 +34,4 @@ public class EvaluationResult {
     /** AI 的自然回复 */
     private String aiReply;
 }
+
