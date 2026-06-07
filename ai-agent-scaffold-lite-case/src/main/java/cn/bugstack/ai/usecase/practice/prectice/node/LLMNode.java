@@ -1,5 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice.node;
 
+import cn.bugstack.ai.domain.practice.event.EvaluationResultPublisher;
 import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
@@ -49,7 +50,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
             try {
                 Scenario scenario = Scenario.fromCode(scenarioCode);
                 EvaluationResult eval = evaluationService.evaluate(asrText, scenario, "");
-                PracticeAudioWebSocketHandler.sendEvalResult(sessionId, eval);
+                EvaluationResultPublisher.publish(sessionId, eval);
                 log.info("Async eval done: sessionId={}, score={}, issues={}",
                         sessionId, eval.getScore(),
                         eval.getGrammarIssues() != null ? eval.getGrammarIssues().size() : 0);
