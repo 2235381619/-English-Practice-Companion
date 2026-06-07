@@ -1,5 +1,7 @@
 package cn.bugstack.ai.config;
 
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -64,9 +66,16 @@ public class PracticeConfig {
                 .build();
     }
 
-    @Bean
-    public org.springframework.ai.chat.memory.ChatMemory chatMemory() {
-        return org.springframework.ai.chat.memory.MessageWindowChatMemory.builder()
+    @Bean("chatChatMemory")
+    public ChatMemory chatChatMemory() {
+        return MessageWindowChatMemory.builder()
+                .maxMessages(20)
+                .build();
+    }
+
+    @Bean("evalChatMemory")
+    public ChatMemory evalChatMemory() {
+        return MessageWindowChatMemory.builder()
                 .maxMessages(10)
                 .build();
     }
