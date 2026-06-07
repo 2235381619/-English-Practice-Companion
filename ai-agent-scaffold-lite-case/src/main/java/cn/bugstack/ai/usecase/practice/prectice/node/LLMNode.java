@@ -47,13 +47,13 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         String scenarioCode = ctx.getScenarioCode();
         String sessionId = req.getSessionId();
         CompletableFuture.runAsync(() -> {
+            log.info("Async eval starting: sessionId={}", sessionId);
             try {
                 Scenario scenario = Scenario.fromCode(scenarioCode);
-                    EvaluationResult eval = evaluationService.evaluate(sessionId, asrText, scenario);
+                EvaluationResult eval = evaluationService.evaluate(sessionId, asrText, scenario);
+                log.info("Async eval completed: sessionId={}, score={}", sessionId, eval.getScore());
                 EvaluationResultPublisher.publish(sessionId, eval);
-                log.info("Async eval done: sessionId={}, score={}, issues={}",
-                        sessionId, eval.getScore(),
-                        eval.getGrammarIssues() != null ? eval.getGrammarIssues().size() : 0);
+                log.info("Async eval published: sessionId={}", sessionId);
             } catch (Exception e) {
                 log.warn("Async evaluation failed: {}", e.getMessage());
             }

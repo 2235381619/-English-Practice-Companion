@@ -194,6 +194,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
      */
     public static void sendEvalResult(String sessionId, EvaluationResult eval) {
         // Save to rounds for report polling
+        log.info("sendEvalResult: storing eval for sessionId={}", sessionId);
         java.util.Map<String, Object> round = new java.util.HashMap<>();
         round.put("correctedText", eval.getCorrectedText() != null ? eval.getCorrectedText() : "");
         round.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
