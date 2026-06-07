@@ -10,6 +10,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class PracticeConfig {
@@ -55,6 +56,7 @@ public class PracticeConfig {
                 .build();
     }
 
+    @Primary
     @Bean("practiceChatModel")
     public ChatModel chatModel(OpenAiApi openAiApi) {
         return OpenAiChatModel.builder()
@@ -91,5 +93,7 @@ public class PracticeConfig {
                 .build();
     }
 }
+
+
 
 
