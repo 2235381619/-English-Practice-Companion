@@ -1,6 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice.factory;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.prectice.node.RootNode;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
@@ -32,6 +32,7 @@ public class DefaultPracticeFactory {
         private java.util.List<String> suggestions = new java.util.ArrayList<>();
         private int score;
         private String audioUrl;
+        private String audioData;
         private boolean success;
         private String errorMsg;
     }

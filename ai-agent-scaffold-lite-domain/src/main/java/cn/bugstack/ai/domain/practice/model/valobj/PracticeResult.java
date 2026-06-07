@@ -23,6 +23,9 @@ public class PracticeResult {
     /** TTS 音频 URL（预留） */
     private String audioUrl;
 
+    /** TTS 音频 Base64 数据 */
+    private String audioData;
+
     /** LLM 建议 **/
     private String suggestion;
 
@@ -30,3 +33,5 @@ public class PracticeResult {
 //        return new PracticeResult(ctx.getAsrText(), ctx.getReplyText(), ctx.getAudioUrl());
 //    }
 }
+
+

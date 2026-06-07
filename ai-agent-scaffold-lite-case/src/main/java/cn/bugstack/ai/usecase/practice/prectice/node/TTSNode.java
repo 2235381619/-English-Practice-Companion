@@ -9,17 +9,16 @@ import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.nio.file.Files;
+import java.util.Base64;
 
 /**
  * TTS 节点 — 将 LLM 回复合成为音频
  *
  * 根据前端传入的 voice.speed/volume/pitch 动态调节语音参数，
- * 合成后的音频文件保存到 audio.output.dir 目录下。
+ * 合成后的音频以 Base64 格式嵌入响应体，前端可直接播放。
  */
 @Slf4j
 @Component
@@ -27,15 +26,6 @@ public class TTSNode extends AbstractPracticeServiceSupport {
 
     @Resource
     private ITtsService ttsService;
-
-    @Value("${audio.output.dir:./audio}")
-        private String audioOutputDir;
-
-    @Value("${server.port:8091}")
-    private String serverPort;
-
-    @Value("${audio.base-url:}")
-    private String audioBaseUrl;
 
     @Override
     protected PracticeResult doApply(HandlePracticeMessageCommandEntity requestParameter,
@@ -62,21 +52,13 @@ public class TTSNode extends AbstractPracticeServiceSupport {
             return buildResult(dynamicContext);
         }
 
-        // 保存音频文件
-        String audioFileName = requestParameter.getSessionId() + "_" + System.currentTimeMillis() + ".mp3";
-        File audioDir = new File(audioOutputDir);
-        if (!audioDir.exists()) {
-            audioDir.mkdirs();
-        }
-        File audioFile = new File(audioDir, audioFileName);
-        Files.write(audioFile.toPath(), audio);
-
-        String audioUrl = (audioBaseUrl.isEmpty() ? "http://localhost:" + serverPort : audioBaseUrl) + "/audio/" + audioFileName;
-        dynamicContext.setAudioUrl(audioUrl);
+        // 音频转 Base64，嵌入响应体，前端直接播放
+        String audioBase64 = Base64.getEncoder().encodeToString(audio);
+        dynamicContext.setAudioData(audioBase64);
         dynamicContext.setSuccess(true);
 
-        log.info("TTSNode: synthesized {} bytes, voice={}, url={}, sessionId={}",
-                audio.length, voice, audioUrl, requestParameter.getSessionId());
+        log.info("TTSNode: synthesized {} bytes, voice={}, sessionId={}",
+                audio.length, voice, requestParameter.getSessionId());
 
         return buildResult(dynamicContext);
     }
@@ -85,7 +67,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         return PracticeResult.builder()
                 .asrText(ctx.getAsrText())
                 .replyText(ctx.getReplyText())
-                .audioUrl(ctx.getAudioUrl())
+                .audioData(ctx.getAudioData())
                 .suggestion(ctx.getSuggestions() != null ? String.join("; ", ctx.getSuggestions()) : "")
                 .build();
     }

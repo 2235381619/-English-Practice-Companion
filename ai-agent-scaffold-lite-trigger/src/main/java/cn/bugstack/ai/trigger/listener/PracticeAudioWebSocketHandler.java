@@ -1,6 +1,6 @@
 package cn.bugstack.ai.trigger.listener;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
@@ -11,8 +11,6 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -119,6 +117,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
             resp.put("suggestions", ctx.getSuggestions() != null ? ctx.getSuggestions() : new java.util.ArrayList());
             resp.put("score", ctx.getScore());
             resp.put("audioUrl", ctx.getAudioUrl() != null ? ctx.getAudioUrl() : "");
+            resp.put("audioData", ctx.getAudioData() != null ? ctx.getAudioData() : "");
             sendJson(session, resp.toJSONString());
             log.info("Audio processed: sessionId={}, asrText=\"{}\", replyText=\"{}\"",
                     sessionId, ctx.getAsrText(), ctx.getReplyText());

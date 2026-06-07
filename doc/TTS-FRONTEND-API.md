@@ -39,7 +39,7 @@
   "data": {
     "asrText":   "user speech text",
     "replyText": "LLM reply text",
-    "audioUrl":  "http://localhost:8091/audio/sessionId.mp3",
+    "audioData": "//AAA...base64...",
     "suggestion": "grammar suggestion"
   }
 }
