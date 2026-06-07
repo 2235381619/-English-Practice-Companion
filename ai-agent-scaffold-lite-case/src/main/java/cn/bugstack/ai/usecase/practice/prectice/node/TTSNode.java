@@ -80,7 +80,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
                 .asrText(ctx.getAsrText())
                 .replyText(ctx.getReplyText())
                 .audioUrl(ctx.getAudioUrl())
-                .suggestion(String.join("; ", ctx.getSuggestions()))
+                .suggestion(ctx.getSuggestions() != null ? String.join("; ", ctx.getSuggestions()) : "")
                 .build();
     }
 
