@@ -125,7 +125,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                     .inputType(1)
                     .audioData(audioData);
                     // 应用语音参数
-                    java.util.Map<String, Integer> map = sessionVoices.get(sessionId);
+                    java.util.Map<String, Integer> v = sessionVoices.get(sessionId);
                     if (v != null) {
                         reqBuilder.voice(new cn.bugstack.ai.domain.practice.model.valobj.VoiceVo(
                                 v.getOrDefault("speed", 50),
