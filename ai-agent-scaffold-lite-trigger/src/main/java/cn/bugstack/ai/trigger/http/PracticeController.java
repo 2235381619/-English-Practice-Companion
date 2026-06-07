@@ -24,7 +24,7 @@ import jakarta.annotation.Resource;
 @RestController
 @RequestMapping("/api/v1/practice/")
 @CrossOrigin(origins = "*")
-public class PracticeController {
+public class PracticeController implements cn.bugstack.ai.api.practice.IPracticeController {
 
     @Resource
     private IPracticeService2 practiceService2;
