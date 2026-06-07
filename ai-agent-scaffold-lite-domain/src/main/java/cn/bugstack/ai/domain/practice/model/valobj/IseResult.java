@@ -1,4 +1,4 @@
-package cn.bugstack.ai.domain.practice.service.Ise;
+package cn.bugstack.ai.domain.practice.model.valobj;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
