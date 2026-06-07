@@ -15,6 +15,7 @@ import org.springframework.ai.chat.client.ChatClient;
 @Slf4j
 @Service
 public class ChatLlmServiceImpl implements IChatLlmService {
+    private final ConcurrentHashMap<String, ChatClient> sessionClients = new ConcurrentHashMap<>();
 
     private static final String CHAT_TEMPLATE = "{systemPrompt}\n\nUser: {userText}\nAssistant:";
 

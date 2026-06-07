@@ -22,6 +22,8 @@ public class PracticeController {
 
     @Resource
     private IPracticeService2 practiceService2;
+    @Resource
+    private IChatLlmService chatLlmService;
 
     @PostMapping("text")
     public Response<PracticeResult> submitText(@RequestBody HandlePracticeMessageCommandEntity request) {

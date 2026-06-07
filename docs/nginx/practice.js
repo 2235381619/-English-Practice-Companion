@@ -32,6 +32,8 @@ function initPractice() {
       "<div class=\"scenario-card\" onclick=\"selectScenario('meeting')\"><div class=\"scenario-card-icon\">&#x1F4CB;</div><div class=\"scenario-card-name\">Meeting</div><div class=\"scenario-card-desc\">Business meeting</div></div>";
   }
   initVoiceSettings();
+  registerScenario(sessionId, code);
+  initVoiceSettings();
   updateUI();
 }
 
@@ -62,10 +64,9 @@ function initVoiceSettings() {
 
 
 function registerScenario(sessionId, code) {
-  fetch(PRACTICE_API + "/scenario", {
+  fetch(PRACTICE_API + "/scenario/" + sessionId + "/" + code, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId: sessionId, scenarioCode: code })
+    headers: { "Content-Type": "application/json" }
   }).catch(function(e) { console.warn("Scenario registration failed:", e); });
 }
 
@@ -92,7 +93,7 @@ function startRecording() {
   try {
     var ws = new WebSocket(WS_BASE + "/" + sessionId);
     ws.binaryType = "arraybuffer";
-    ws.onopen = function() { ws.send(JSON.stringify({ type: "config", scenarioCode: selectedScenario || "default" })); };
+    ws.onopen = function() { ws.send(JSON.stringify({ type: "config" })); };
     ws.onmessage = function(ev) {
       if (typeof ev.data === "string") { try { var d = JSON.parse(ev.data); if (d.type === "evaluation") { handleEvaluation(d); } else { handleResult(d); } } catch(e) {} }
     };
@@ -178,7 +179,7 @@ function sendPracticeText() {
   fetch(PRACTICE_API + "/text", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(function(){var b={sessionId:sessionId,text:text};if(voiceLocked.speed||voiceLocked.volume||voiceLocked.pitch){b.voice={speed:voiceSettings.speed,volume:voiceSettings.volume,pitch:voiceSettings.pitch}}return b}())
+    body: JSON.stringify({ sessionId: sessionId, text: text })
   }).then(function(r) { return r.json(); }).then(function(json) {
     if (json.code === "0000" && json.data) handleResult(json.data);
   }).catch(function(e) { console.warn(e); });
@@ -198,6 +199,20 @@ function handleResult(data) {
   if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";
   updateUI();
+}
+
+
+function handleEvaluation(data) {
+  if (messages.length > 0) {
+    var last = messages[messages.length - 1];
+    if (last.role === "assistant") {
+      if (data.correctedText) last.correctedText = data.correctedText;
+      if (data.grammarIssues) last.grammarIssues = data.grammarIssues;
+      if (data.suggestions) last.suggestions = data.suggestions;
+      if (data.score) last.score = data.score;
+      renderMessages();
+    }
+  }
 }
 
 

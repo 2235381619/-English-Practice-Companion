@@ -1,6 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.AbstractMultiThreadStrategyRouter;
