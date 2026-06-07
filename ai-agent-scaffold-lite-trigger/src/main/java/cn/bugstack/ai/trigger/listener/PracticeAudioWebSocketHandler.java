@@ -187,6 +187,14 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
      * 异步评测结果推送到前端 WebSocket
      */
     public static void sendEvalResult(String sessionId, EvaluationResult eval) {
+        // Save to rounds for report polling
+        java.util.Map<String, Object> round = new java.util.HashMap<>();
+        round.put("correctedText", eval.getCorrectedText() != null ? eval.getCorrectedText() : "");
+        round.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
+        round.put("suggestions", eval.getSuggestions() != null ? eval.getSuggestions() : new java.util.ArrayList());
+        round.put("score", eval.getScore());
+        saveRound(sessionId, round);
+
         WebSocketSession session = liveSessions.get(sessionId);
         if (session != null && session.isOpen()) {
             try {
