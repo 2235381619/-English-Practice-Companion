@@ -18,7 +18,7 @@ import java.nio.file.Files;
 /**
  * TTS 节点 — 将 LLM 回复合成为音频
  *
- * 根据前端传入的 speed/volume/pitch 动态调节语音参数，
+ * 根据前端传入的 voice.speed/volume/pitch 动态调节语音参数，
  * 合成后的音频文件保存到 audio.output.dir 目录下。
  */
 @Slf4j
@@ -42,12 +42,11 @@ public class TTSNode extends AbstractPracticeServiceSupport {
             return buildResult(dynamicContext);
         }
 
-        // 构建语音参数：前端可选传入，缺省走 50
-        VoiceVo voice = new VoiceVo(
-                requestParameter.getSpeed()  != null ? requestParameter.getSpeed()  : 50,
-                requestParameter.getVolume() != null ? requestParameter.getVolume() : 50,
-                requestParameter.getPitch()  != null ? requestParameter.getPitch()  : 50
-        );
+        // 前端传入的语音参数，缺省走默认值
+        VoiceVo voice = requestParameter.getVoice();
+        if (voice == null) {
+            voice = VoiceVo.defaultVoice();
+        }
 
         // TTS 合成
         byte[] audio = ttsService.synthesize(replyText, voice);

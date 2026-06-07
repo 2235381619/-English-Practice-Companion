@@ -2,7 +2,7 @@
 
 ## 变更内容
 
-口语练习接口 `/api/v1/practice/text` 和 `/api/v1/practice/session` 的请求体新增了 `speed`、`volume`、`pitch` 三个可选字段，用于动态调节 TTS 合成语音。
+口语练习接口 `/api/v1/practice/text` 和 `/api/v1/practice/session` 的请求体新增 `voice` 字段，用于动态调节 TTS 合成语音。
 
 ---
 
@@ -13,25 +13,24 @@
   "sessionId":    "uuid-xxx",
   "text":         "Hello, how are you?",
   "scenarioCode": "interview",
-  "speed":        70,
-  "volume":       80,
-  "pitch":        60
+  "voice": {
+    "speed":  70,
+    "volume": 80,
+    "pitch":  60
+  }
 }
 ```
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `speed` | int | 否 | 语速 0-100，默认 50 |
-| `volume` | int | 否 | 音量 0-100，默认 50 |
-| `pitch` | int | 否 | 音高 0-100，默认 50 |
-
-不传时用默认值 50/50/50 合成。
+| `voice` | object | 否 | 语音参数，不传时用默认值 |
+| `voice.speed` | int | 否 | 语速 0-100，默认 50 |
+| `voice.volume` | int | 否 | 音量 0-100，默认 50 |
+| `voice.pitch` | int | 否 | 音高 0-100，默认 50 |
 
 ---
 
-## 响应变化
-
-响应体新增 `audioUrl` 字段：
+## 响应
 
 ```json
 {
@@ -56,7 +55,7 @@ audio.play();
 
 ## 调用示例
 
-### 正常语速（不传参）
+### 默认音色（不传 voice）
 ```json
 {
   "sessionId": "abc",
@@ -71,8 +70,6 @@ audio.play();
   "sessionId": "abc",
   "text": "Hello!",
   "scenarioCode": "interview",
-  "speed":  80,
-  "volume": 90,
-  "pitch":  50
+  "voice": { "speed": 80, "volume": 90, "pitch": 50 }
 }
 ```

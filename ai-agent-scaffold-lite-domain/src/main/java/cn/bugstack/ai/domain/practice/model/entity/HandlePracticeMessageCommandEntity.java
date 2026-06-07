@@ -1,5 +1,6 @@
 package cn.bugstack.ai.domain.practice.model.entity;
 
+import cn.bugstack.ai.domain.practice.model.valobj.VoiceVo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,10 +17,6 @@ public class HandlePracticeMessageCommandEntity {
     private byte[] audioData;
     private String text;
     private String scenarioCode;
-    /** 语速 0-100，默认 50 */
-    private Integer speed;
-    /** 音量 0-100，默认 50 */
-    private Integer volume;
-    /** 音高 0-100，默认 50 */
-    private Integer pitch;
+    /** 语音参数（speed/volume/pitch），可选 */
+    private VoiceVo voice;
 }
