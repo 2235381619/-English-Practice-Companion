@@ -25,20 +25,19 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Resource(name = "evlChatModel")
     private ChatModel evalChatModel;
 
-    @Resource
+    @Resource(name = "evalChatMemory")
     private ChatMemory chatMemory;
 
     @Override
     public EvaluationResult evaluate(String sessionId, String userText, Scenario scenario) {
         log.info("GPT evaluate request: {}", userText);
         try {
-            boolean hasSystem = chatMemory.get(sessionId, 100).stream()
-                    .anyMatch(m -> m instanceof SystemMessage);
-            if (!hasSystem) {
-                chatMemory.add(sessionId, new SystemMessage(EVAL_SYSTEM_PROMPT + " Scenario: " + scenario.getSystemPrompt()));
-            }
+            String systemText = EVAL_SYSTEM_PROMPT + " Scenario: " + scenario.getSystemPrompt();
             chatMemory.add(sessionId, new UserMessage(userText));
-            Prompt prompt = new Prompt(chatMemory.get(sessionId));
+            java.util.List<Message> messages = new java.util.ArrayList<>(chatMemory.get(sessionId).size() + 1);
+            messages.add(new SystemMessage(systemText));
+            messages.addAll(chatMemory.get(sessionId));
+            Prompt prompt = new Prompt(messages);
             String response = evalChatModel.call(prompt).getResult().getOutput().getText();
             chatMemory.add(sessionId, new AssistantMessage(response));
             return parseEvaluation(response, userText);
@@ -124,4 +123,6 @@ private EvaluationResult parseEvaluation(String json, String originalText) {
                 .map(s -> s.replace("\\\"", "\"")).toList();
     }
 }
+
+
 
