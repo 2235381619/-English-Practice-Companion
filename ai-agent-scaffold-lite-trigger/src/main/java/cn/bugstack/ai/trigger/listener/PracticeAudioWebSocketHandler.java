@@ -145,24 +145,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
             log.info("Audio processed: sessionId={}, asrText=\"{}\", replyText=\"{}\"",
                     sessionId, ctx.getAsrText(), ctx.getReplyText());
 
-            // 异步评测（语法纠错 + 发音评分），不阻塞主流程
-            var asrText = ctx.getAsrText();
-            var audioBytes = ctx.getAudioBytes();
-            var sc = scenarioCode;
-            if (asrText != null && !asrText.isBlank()) {
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        log.info("WS async eval starting: sessionId={}", sessionId);
-                        EvaluationResult eval = evaluationService.evaluate(
-                                sessionId, asrText, Scenario.fromCode(sc), audioBytes);
-                        log.info("WS async eval completed: sessionId={}, score={}", sessionId, eval.getScore());
-                        EvaluationResultPublisher.publish(sessionId, eval);
-                    } catch (Exception ex) {
-                        log.warn("WS async eval failed: sessionId={}, {}", sessionId, ex.getMessage());
-                    }
-                });
-            }
-
+          
         } catch (Exception e) {
             log.error("Process audio failed: sessionId={}", sessionId, e);
             sendJson(session, "{\"error\":\"processing error\"}");

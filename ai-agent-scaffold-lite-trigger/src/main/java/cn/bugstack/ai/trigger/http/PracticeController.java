@@ -39,7 +39,7 @@ public class PracticeController {
     @PostMapping("text")
     public Response<PracticeResult> submitText(@RequestBody HandlePracticeMessageCommandEntity request) {
         try {
-                        request.setInputType(2);
+            request.setInputType(2);
             PracticeResult result = practiceService2.handleMessage(request);
 
             // 同步评测（语法纠错 + 发音评分），包含在响应中
@@ -63,8 +63,6 @@ public class PracticeController {
                     log.warn("Sync eval failed: {}", e.getMessage());
                 }
             }
-
-            java.util.Map<String, Object> round = new java.util.HashMap<>();
             Map<String, Object> round = new HashMap<>();
             round.put("asrText", result.getAsrText());
             round.put("replyText", result.getReplyText());
