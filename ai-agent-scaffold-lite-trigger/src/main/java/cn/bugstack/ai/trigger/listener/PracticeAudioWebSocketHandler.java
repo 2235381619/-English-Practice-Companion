@@ -35,6 +35,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
     private static final ConcurrentHashMap<String, ByteArrayOutputStream> audioBuffers = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> liveSessions = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> sessionScenarios = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, java.util.Map<String, Integer>> sessionVoices = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, java.util.List<java.util.Map<String, Object>>> sessionRounds = new ConcurrentHashMap<>();
 
         private final DefaultPracticeFactory practiceFactory;
@@ -124,7 +125,7 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                     .inputType(1)
                     .audioData(audioData);
                     // 应用语音参数
-                    java.util.Map<String, Integer> v = sessionVoices.get(sessionId);
+                    java.util.Map<String, Integer> map = sessionVoices.get(sessionId);
                     if (v != null) {
                         reqBuilder.voice(new cn.bugstack.ai.domain.practice.model.valobj.VoiceVo(
                                 v.getOrDefault("speed", 50),
