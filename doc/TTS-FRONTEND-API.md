@@ -1,8 +1,9 @@
 # TTS 语音参数 — 前端接入说明
 
-## 变更内容
+## 待办清单
 
-口语练习接口 `/api/v1/practice/text` 和 `/api/v1/practice/session` 的请求体新增 `voice` 字段，用于动态调节 TTS 合成语音。
+- [x] **请求接入 `voice` 字段** — 请求体已支持 `voice.speed/volume/pitch`
+- [ ] **播放 `audioUrl`** — 响应里的 `audioUrl` 需前端 `new Audio(url).play()` 播出来
 
 ---
 
@@ -38,17 +39,10 @@
   "data": {
     "asrText":   "user speech text",
     "replyText": "LLM reply text",
-    "audioUrl":  "/audio/uuid-xxx.mp3",
+    "audioUrl":  "http://localhost:8091/audio/sessionId.mp3",
     "suggestion": "grammar suggestion"
   }
 }
-```
-
-前端拿到 `audioUrl` 后直接播放：
-
-```javascript
-const audio = new Audio(result.data.audioUrl);
-audio.play();
 ```
 
 ---
