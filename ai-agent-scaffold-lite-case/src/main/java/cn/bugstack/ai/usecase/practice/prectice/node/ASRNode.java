@@ -1,7 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice.node;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
-import cn.bugstack.ai.domain.practice.model.valobj.PracticeDynamicContext;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.domain.practice.service.IAsrService;
 import cn.bugstack.ai.usecase.practice.prectice.AbstractPracticeServiceSupport;
@@ -9,7 +8,6 @@ import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,9 +25,10 @@ public class ASRNode extends AbstractPracticeServiceSupport {
 
     @Override
     protected PracticeResult doApply(HandlePracticeMessageCommandEntity requestParameter, DefaultPracticeFactory.DynamicContext dynamicContext) throws Exception {
+        long start = System.currentTimeMillis();
         String text = asrService.transcribe(requestParameter.getAudioData());
         dynamicContext.setAsrText(text);
-        log.info("ASRNode: result=\"{}\", sessionId={}", text, requestParameter.getSessionId());
+        log.info("ASRNode: result=\"{}\", sessionId={}, cost={}ms", text, requestParameter.getSessionId(), System.currentTimeMillis() - start);
         return router(requestParameter, dynamicContext);
     }
 

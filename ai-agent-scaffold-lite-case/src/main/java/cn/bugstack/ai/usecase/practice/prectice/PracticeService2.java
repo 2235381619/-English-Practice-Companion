@@ -1,6 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.IPracticeService2;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
@@ -21,6 +21,7 @@ public class PracticeService2 implements IPracticeService2 {
 
     @Override
     public PracticeResult handleMessage(HandlePracticeMessageCommandEntity request) throws Exception {
+        long start = System.currentTimeMillis();
         DefaultPracticeFactory.DynamicContext ctx = new DefaultPracticeFactory.DynamicContext();
         ctx.setSessionId(request.getSessionId());
 
@@ -29,6 +30,7 @@ public class PracticeService2 implements IPracticeService2 {
         PracticeResult result = handler.apply(request, ctx);
 
         log.info("PracticeService2: asrText=\"{}\", replyText=\"{}\"", result.getAsrText(), result.getReplyText());
+        log.info("PracticeService2: totalCost={}ms", System.currentTimeMillis() - start);
 
         return result;
     }

@@ -1,6 +1,6 @@
 package cn.bugstack.ai.usecase.practice.prectice.node;
 
-import cn.bugstack.ai.domain.practice.model.valobj.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
@@ -29,6 +29,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
     @Override
     protected PracticeResult doApply(HandlePracticeMessageCommandEntity req,
                                      DefaultPracticeFactory.DynamicContext ctx) throws Exception {
+        long start = System.currentTimeMillis();
         String asrText = ctx.getAsrText();
         if (asrText == null || asrText.isBlank()) {
             log.warn("LLMNode: asrText empty, sessionId={}", req.getSessionId());
@@ -52,7 +53,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
             log.warn("Evaluation failed: {}", e.getMessage());
         }
 
-        log.info("LLMNode: sessionId={}", req.getSessionId());
+        log.info("LLMNode: sessionId={}, cost={}ms", req.getSessionId(), System.currentTimeMillis() - start);
         return router(req, ctx);
     }
 

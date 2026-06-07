@@ -30,6 +30,7 @@ public class TTSNode extends AbstractPracticeServiceSupport {
     @Override
     protected PracticeResult doApply(HandlePracticeMessageCommandEntity requestParameter,
                                      DefaultPracticeFactory.DynamicContext dynamicContext) throws Exception {
+        long start = System.currentTimeMillis();
         String replyText = dynamicContext.getReplyText();
 
         if (replyText == null || replyText.isBlank()) {
@@ -57,8 +58,8 @@ public class TTSNode extends AbstractPracticeServiceSupport {
         dynamicContext.setAudioData(audioBase64);
         dynamicContext.setSuccess(true);
 
-        log.info("TTSNode: synthesized {} bytes, voice={}, sessionId={}",
-                audio.length, voice, requestParameter.getSessionId());
+        log.info("TTSNode: synthesized {} bytes, voice={}, sessionId={}, cost={}ms",
+                audio.length, voice, requestParameter.getSessionId(), System.currentTimeMillis() - start);
 
         return buildResult(dynamicContext);
     }
