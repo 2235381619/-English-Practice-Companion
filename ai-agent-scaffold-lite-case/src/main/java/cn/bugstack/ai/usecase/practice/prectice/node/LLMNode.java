@@ -49,7 +49,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         CompletableFuture.runAsync(() -> {
             try {
                 Scenario scenario = Scenario.fromCode(scenarioCode);
-                EvaluationResult eval = evaluationService.evaluate(asrText, scenario, "");
+                    EvaluationResult eval = evaluationService.evaluate(asrText, scenario, "");
                 EvaluationResultPublisher.publish(sessionId, eval);
                 log.info("Async eval done: sessionId={}, score={}, issues={}",
                         sessionId, eval.getScore(),

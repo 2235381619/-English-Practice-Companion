@@ -2,68 +2,58 @@ package cn.bugstack.ai.domain.practice.service.Evaluation;
 
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
+import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 评测服务 — GPT 语法纠错 + 表达建议 + 评分
- *
- * 纯功能实现，属于 domain 层。
  */
 @Slf4j
 @Service
 public class EvaluationService implements IEvaluationService {
 
-    private static final String EVAL_TEMPLATE = """
-            You are an English tutor. Evaluate the user's speech in this scenario:
+    private static final String EVAL_SYSTEM_PROMPT = """
+            You are a professional English tutor. Evaluate the user's speech.
+
             Scenario: {scenarioPrompt}
 
-            User said: {userText}
             History: {history}
 
-            Respond in this JSON format (no markdown):
+            Analyze the user's latest message and respond with JSON only, no markdown:
+            - correctedText: grammatically corrected version
+            - grammarIssues: list of grammar problems found
+            - suggestions: better ways to express the same idea
+            - score: overall quality from 1 to 10
+            - aiReply: a natural conversational response that continues the scenario AND incorporates the correction naturally
+
+            Example format (use this exact structure):
             {
-              "correctedText": "Grammatically corrected version of the user text",
-              "grammarIssues": ["issue 1", "issue 2"],
-              "suggestions": ["better expression 1", "better expression 2"],
-              "score": <1-10>,
-              "aiReply": "Natural conversational response continuing the scenario AND incorporating the correction"
+              "correctedText": "...",
+              "grammarIssues": ["...", "..."],
+              "suggestions": ["...", "..."],
+              "score": 7,
+              "aiReply": "..."
             }
             """;
 
-    private static final String SIMPLE_EVAL_TEMPLATE = """
-            You are a {scenarioPrompt}
+    private final IChatLlmService chatLlmService;
 
-            User said: {userText}
-
-            Respond naturally — continue the conversation, correct grammar subtly, and suggest better expressions naturally.
-            Keep it concise (1-3 sentences).
-            """;
-
-    private final ChatModel chatModel;
-
-    public EvaluationService(ChatModel chatModel) {
-        this.chatModel = chatModel;
+    public EvaluationService(IChatLlmService chatLlmService) {
+        this.chatLlmService = chatLlmService;
     }
 
+    @Override
     public EvaluationResult evaluate(String userText, Scenario scenario, String history) {
         log.info("GPT evaluate request: {}", userText);
         try {
-            Map<String, Object> vars = Map.of(
-                    "scenarioPrompt", scenario.getSystemPrompt(),
-                    "userText", userText,
-                    "history", history == null ? "" : history
-            );
-            PromptTemplate template = new PromptTemplate(EVAL_TEMPLATE);
-            Prompt prompt = template.create(vars);
-            String response = chatModel.call(prompt).getResult().getOutput().getText();
+            String systemPrompt = EVAL_SYSTEM_PROMPT
+                    .replace("{scenarioPrompt}", scenario.getSystemPrompt())
+                    .replace("{history}", history == null ? "" : history);
+            String response = chatLlmService.chat(userText, systemPrompt);
             return parseEvaluation(response, userText);
         } catch (Exception e) {
             log.warn("Evaluation failed, falling back: {}", e.getMessage());
@@ -71,19 +61,25 @@ public class EvaluationService implements IEvaluationService {
         }
     }
 
+    @Override
     public EvaluationResult simpleReply(String userText, Scenario scenario) {
-        return fallbackEvaluation(userText, scenario);
+        try {
+            String prompt = "You are " + scenario.getSystemPrompt()
+                    + " Respond naturally (1-3 sentences): ";
+            String reply = chatLlmService.chat(userText, prompt);
+            return EvaluationResult.builder()
+                    .originalText(userText).aiReply(reply).score(5).build();
+        } catch (Exception e) {
+            return EvaluationResult.builder()
+                    .originalText(userText).aiReply("I see. Please go on.").score(5).build();
+        }
     }
 
     private EvaluationResult fallbackEvaluation(String userText, Scenario scenario) {
         try {
-            Map<String, Object> vars = Map.of(
-                    "scenarioPrompt", scenario.getSystemPrompt(),
-                    "userText", userText
-            );
-            PromptTemplate template = new PromptTemplate(SIMPLE_EVAL_TEMPLATE);
-            Prompt prompt = template.create(vars);
-            String reply = chatModel.call(prompt).getResult().getOutput().getText();
+            String prompt = "You are " + scenario.getSystemPrompt()
+                    + " Correct the grammar and respond naturally (1-3 sentences): ";
+            String reply = chatLlmService.chat(userText, prompt);
             return EvaluationResult.builder().originalText(userText)
                     .correctedText(userText).aiReply(reply).score(5).build();
         } catch (Exception e) {

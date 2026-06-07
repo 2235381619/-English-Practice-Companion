@@ -63,4 +63,24 @@ public class PracticeConfig {
                         .build())
                 .build();
     }
+
+    @Bean
+    public org.springframework.ai.chat.memory.ChatMemory chatMemory() {
+        return org.springframework.ai.chat.memory.MessageWindowChatMemory.builder()
+                .maxMessages(10)
+                .build();
+    }
+
+    @Bean("evlChatModel")
+    public ChatModel evalchatModel(OpenAiApi openAiApi) {
+        return OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model("deepseek-chat")
+                        .temperature(0.7d)
+                        .build())
+                .build();
+    }
 }
+
+
