@@ -73,11 +73,11 @@ public class PracticeController {
         }
     }
 
-    @PostMapping("scenario")
-    public Response<Void> registerScenario(@RequestBody HandlePracticeMessageCommandEntity request) {
+    @PostMapping("scenario/{sessionId}/{scenarioCode}")
+    public Response<Void> registerScenario(@PathVariable String sessionId, @PathVariable String scenarioCode) {
         try {
-            chatLlmService.chatRegister(request.getSessionId(), request.getScenarioCode());
-            log.info("Scenario registered: sessionId={}, scenario={}", request.getSessionId(), request.getScenarioCode());
+            chatLlmService.chatRegister(sessionId, scenarioCode);
+            log.info("Scenario registered: sessionId={}, scenario={}", sessionId, scenarioCode);
             return Response.<Void>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
