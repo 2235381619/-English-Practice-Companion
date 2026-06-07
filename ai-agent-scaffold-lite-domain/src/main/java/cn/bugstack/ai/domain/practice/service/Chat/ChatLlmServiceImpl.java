@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -47,7 +48,11 @@ public class ChatLlmServiceImpl implements IChatLlmService {
             return chat(userText, "You are a friendly English conversation partner. Keep responses natural and concise (1-3 sentences).");
         }
         try {
-            String reply = client.prompt().user(userText).call().content();
+            String reply = client.prompt()
+                    .user(userText)
+                    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+                    .call()
+                    .content();
             log.info("ChatLlm: len={} -> len={}", userText.length(), reply != null ? reply.length() : 0);
             return reply != null ? reply.trim() : "";
         } catch (Exception e) {
@@ -62,7 +67,9 @@ public class ChatLlmServiceImpl implements IChatLlmService {
         String prompt = SCENARIO_PROMPTS.getOrDefault(scenario, SCENARIO_PROMPTS.get("default"));
         ChatClient client = ChatClient.builder(chatModel)
                 .defaultSystem(prompt)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
+        chatMemory.clear(sessionId);
         sessionClients.put(sessionId, client);
         log.info("Scenario registered: sessionId={}, scenario={}", sessionId, scenario);
     }
@@ -87,3 +94,5 @@ public class ChatLlmServiceImpl implements IChatLlmService {
         }
     }
 }
+
+
