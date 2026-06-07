@@ -79,18 +79,21 @@ sequenceDiagram
     F->>C: POST /text { sessionId, text }
     C->>S: handleMessage()
     S->>T: 规则树编排
+    T->>T: ASRNode → asrText
+    Note over T: LLMNode内异步触发评测
     T->>T: LLMNode → chatBySession() → replyText
+    T->>T: → 异步评测（不阻塞TTS）
     T->>T: TTSNode → 合成音频
     T-->>S: PracticeResult
     S-->>C: 返回结果
-    C->>E: evaluate() 同步评测
+    Note over C: Controller同步评测（另一次调用）
+    C->>E: evaluate() 同步
     E->>G: GPT语法纠错
     E->>G: ISE发音评分
     E-->>C: EvaluationResult
-    C-->>F: HTTP响应 { reply, audioData, correctedText, score, iseTotalScore... }
-```
-
-### WebSocket 音频输入 — `ws://.../practice/audio/{sessionId}`
+    C-->>F: HTTP响应 { reply, correctedText, score, iseTotalScore... }
+    Note over F: 异步评测完成后存入sessionRounds，轮询/report可兜底
+```### WebSocket 音频输入 — `ws://.../practice/audio/{sessionId}`
 
 ```mermaid
 sequenceDiagram
@@ -106,24 +109,24 @@ sequenceDiagram
     W->>T: 规则树编排
     T->>T: ASRNode → 语音识别
     T->>T: LLMNode → LLM回复
+    Note over T: LLMNode内异步触发评测
     T->>T: TTSNode → 合成音频
-    T-->>W: 完成
+    T-->>W: 规则树完成
     W-->>F: WS消息 { asrText, replyText, audioUrl }
+    Note over F: 前端保持WS连接，等待异步评测推送
 
-    par 异步评测
-        W->>+E: evaluate() 
+    par 异步评测（LLMNode内触发）
+        T->>+E: evaluate() 
         E->>G: GPT语法纠错
         E->>G: ISE发音评测
-        E-->>-W: EvaluationResult
-        W->>P: publish(sessionId, eval)
+        E-->>-T: EvaluationResult
+        T->>P: publish(sessionId, eval)
         P->>W: callback → sendEvalResult()
         W-->>F: WS消息 { type: "evaluation", correctedText, iseTotalScore... }
     end
 
-    Note over F: 前端收到 type: "evaluation" 后关闭WS连接
-```
-
-## DDD 模块结构
+    Note over F: 前端收到 type: "evaluation" 后关闭WS，超时(12s)则轮询/report兜底
+```## DDD 模块结构
 
 | 模块 | 职责 |
 |------|------|
@@ -144,7 +147,7 @@ RootNode ── inputType=1 ──→ ASRNode ──→ LLMNode ──→ TTSNod
 |------|------|
 | RootNode | 根据 inputType 分发 |
 | ASRNode | 调用 FunASR 将音频转为文本 |
-| LLMNode | 调用 DeepSeek 生成对话回复 |
+| LLMNode | 调用 DeepSeek 生成对话回复 + 异步触发语法/发音评测 |
 | TTSNode | 调用讯飞 TTS 合成音频 |
 
 ## 评测链路
