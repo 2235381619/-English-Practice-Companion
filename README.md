@@ -1,7 +1,7 @@
 # 口语练习助手 — AI English Practice Companion
 
 基于 Spring AI + 讯飞语音技术构建的智能英语口语练习平台，支持场景化对话、语音识别（ASR）、语音合成（TTS）、语法纠错与发音评测（ISE）。
-
+Domo视频为1.demo.mp4
 ## 架构总览
 
 ```mermaid
