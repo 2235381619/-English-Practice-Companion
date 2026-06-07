@@ -2,58 +2,45 @@ package cn.bugstack.ai.domain.practice.service.Evaluation;
 
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
-import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * 评测服务 — GPT 语法纠错 + 表达建议 + 评分
- */
 @Slf4j
 @Service
 public class EvaluationServiceImpl implements IEvaluationService {
 
-    private static final String EVAL_SYSTEM_PROMPT = """
-            You are a professional English tutor. Evaluate the user's speech.
+    private static final String EVAL_SYSTEM_PROMPT = "You are a professional English tutor. Evaluate the user's latest speech.";
 
-            Scenario: {scenarioPrompt}
+    @Resource(name = "evlChatModel")
+    private ChatModel evalChatModel;
 
-            History: {history}
-
-            Analyze the user's latest message and respond with JSON only, no markdown:
-            - correctedText: grammatically corrected version
-            - grammarIssues: list of grammar problems found
-            - suggestions: better ways to express the same idea
-            - score: overall quality from 1 to 10
-            - aiReply: a natural conversational response that continues the scenario AND incorporates the correction naturally
-
-            Example format (use this exact structure):
-            {
-              "correctedText": "...",
-              "grammarIssues": ["...", "..."],
-              "suggestions": ["...", "..."],
-              "score": 7,
-              "aiReply": "..."
-            }
-            """;
-
-    private final IChatLlmService chatLlmService;
-
-    public EvaluationService(IChatLlmService chatLlmService) {
-        this.chatLlmService = chatLlmService;
-    }
+    @Resource
+    private ChatMemory chatMemory;
 
     @Override
-    public EvaluationResult evaluate(String userText, Scenario scenario, String history) {
+    public EvaluationResult evaluate(String sessionId, String userText, Scenario scenario) {
         log.info("GPT evaluate request: {}", userText);
         try {
-            String systemPrompt = EVAL_SYSTEM_PROMPT
-                    .replace("{scenarioPrompt}", scenario.getSystemPrompt())
-                    .replace("{history}", history == null ? "" : history);
-            String response = chatLlmService.chat(userText, systemPrompt);
+            boolean hasSystem = chatMemory.get(sessionId, 100).stream()
+                    .anyMatch(m -> m instanceof SystemMessage);
+            if (!hasSystem) {
+                chatMemory.add(sessionId, new SystemMessage(EVAL_SYSTEM_PROMPT + " Scenario: " + scenario.getSystemPrompt()));
+            }
+            chatMemory.add(sessionId, new UserMessage(userText));
+            Prompt prompt = new Prompt(chatMemory.get(sessionId));
+            String response = evalChatModel.call(prompt).getResult().getOutput().getText();
+            chatMemory.add(sessionId, new AssistantMessage(response));
             return parseEvaluation(response, userText);
         } catch (Exception e) {
             log.warn("Evaluation failed, falling back: {}", e.getMessage());
@@ -64,32 +51,26 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public EvaluationResult simpleReply(String userText, Scenario scenario) {
         try {
-            String prompt = "You are " + scenario.getSystemPrompt()
-                    + " Respond naturally (1-3 sentences): ";
-            String reply = chatLlmService.chat(userText, prompt);
-            return EvaluationResult.builder()
-                    .originalText(userText).aiReply(reply).score(5).build();
+            List<Message> msgs = List.of(new SystemMessage("You are " + scenario.getSystemPrompt()), new UserMessage(userText));
+            String reply = evalChatModel.call(new Prompt(msgs)).getResult().getOutput().getText();
+            return EvaluationResult.builder().originalText(userText).aiReply(reply).score(5).build();
         } catch (Exception e) {
-            return EvaluationResult.builder()
-                    .originalText(userText).aiReply("I see. Please go on.").score(5).build();
+            return EvaluationResult.builder().originalText(userText).aiReply("I see. Please go on.").score(5).build();
         }
     }
 
     private EvaluationResult fallbackEvaluation(String userText, Scenario scenario) {
         try {
-            String prompt = "You are " + scenario.getSystemPrompt()
-                    + " Correct the grammar and respond naturally (1-3 sentences): ";
-            String reply = chatLlmService.chat(userText, prompt);
-            return EvaluationResult.builder().originalText(userText)
-                    .correctedText(userText).aiReply(reply).score(5).build();
+            List<Message> msgs = List.of(new SystemMessage("You are " + scenario.getSystemPrompt()), new UserMessage(userText));
+            String reply = evalChatModel.call(new Prompt(msgs)).getResult().getOutput().getText();
+            return EvaluationResult.builder().originalText(userText).correctedText(userText).aiReply(reply).score(5).build();
         } catch (Exception e) {
             log.warn("Fallback also failed: {}", e.getMessage());
-            return EvaluationResult.builder().originalText(userText)
-                    .correctedText(userText).aiReply("I see. Please go on.").score(5).build();
+            return EvaluationResult.builder().originalText(userText).correctedText(userText).aiReply("I see. Please go on.").score(5).build();
         }
     }
 
-    private EvaluationResult parseEvaluation(String json, String originalText) {
+private EvaluationResult parseEvaluation(String json, String originalText) {
         try {
             String corrected = extractJsonField(json, "correctedText");
             String scoreStr = extractJsonField(json, "score");
