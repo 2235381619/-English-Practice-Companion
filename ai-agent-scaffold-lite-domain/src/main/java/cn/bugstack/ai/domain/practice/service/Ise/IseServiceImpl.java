@@ -112,14 +112,14 @@ public class IseServiceImpl implements IIseService {
             return builder.build();
         } catch (Exception ignored) {}
 
-        Pattern pattern = Pattern.compile("<(\\w+)(?: value=\"([\\d.]+)\")?/?>([\\d.]+)?</\\1>");
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        Pattern pattern = Pattern.compile("(\\w+_score)=\\"([\\d.]+)\\"");
         Matcher matcher = pattern.matcher(raw);
         while (matcher.find()) {
             String tag = matcher.group(1);
             double value = Double.parseDouble(matcher.group(2));
-            String scoreVal = matcher.group(2) != null ? matcher.group(2) : matcher.group(3);
-            if (scoreVal == null) continue;
-            double value = Double.parseDouble(scoreVal);
+            if (seen.contains(tag)) continue;
+            seen.add(tag);
             switch (tag) {
                 case "total_score" -> builder.totalScore(value);
                 case "accuracy_score" -> builder.accuracyScore(value);
@@ -130,5 +130,8 @@ public class IseServiceImpl implements IIseService {
         return builder.build();
     }
 }
+
+
+
 
 
