@@ -43,21 +43,7 @@ public class LLMNode extends AbstractPracticeServiceSupport {
         String reply = chatLlmService.chatBySession(asrText, req.getSessionId());
         ctx.setReplyText(reply);
 
-        // 异步评测，不阻塞 TTS 合成
-        String scenarioCode = ctx.getScenarioCode();
-        String sessionId = req.getSessionId();
-        CompletableFuture.runAsync(() -> {
-            log.info("Async eval starting: sessionId={}", sessionId);
-            try {
-                Scenario scenario = Scenario.fromCode(scenarioCode);
-                EvaluationResult eval = evaluationService.evaluate(sessionId, asrText, scenario, ctx.getAudioBytes());
-                log.info("Async eval completed: sessionId={}, score={}", sessionId, eval.getScore());
-                EvaluationResultPublisher.publish(sessionId, eval);
-                log.info("Async eval published: sessionId={}", sessionId);
-            } catch (Exception e) {
-                log.warn("Async evaluation failed: {}", e.getMessage());
-            }
-        });
+
 
         log.info("LLMNode: sessionId={}, cost={}ms", req.getSessionId(), System.currentTimeMillis() - start);
         return router(req, ctx);

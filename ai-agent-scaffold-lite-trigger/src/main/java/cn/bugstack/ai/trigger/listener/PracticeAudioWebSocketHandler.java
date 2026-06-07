@@ -4,6 +4,10 @@ import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandE
 import cn.bugstack.ai.domain.practice.event.EvaluationResultPublisher;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
+import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
+import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
+import cn.bugstack.ai.domain.practice.service.IEvaluationService;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
 import cn.bugstack.wrench.design.framework.tree.StrategyHandler;
 import jakarta.annotation.PostConstruct;
@@ -14,6 +18,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,13 +37,13 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
     private static final ConcurrentHashMap<String, String> sessionScenarios = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, java.util.List<java.util.Map<String, Object>>> sessionRounds = new ConcurrentHashMap<>();
 
-    private final DefaultPracticeFactory practiceFactory;
+        private final DefaultPracticeFactory practiceFactory;
+    private final IEvaluationService evaluationService;
 
-    public PracticeAudioWebSocketHandler(DefaultPracticeFactory practiceFactory) {
+    public PracticeAudioWebSocketHandler(DefaultPracticeFactory practiceFactory, IEvaluationService evaluationService) {
         this.practiceFactory = practiceFactory;
+        this.evaluationService = evaluationService;
     }
-
-
 
     @PostConstruct
     public void init() {
@@ -139,6 +144,25 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
             sendJson(session, resp.toJSONString());
             log.info("Audio processed: sessionId={}, asrText=\"{}\", replyText=\"{}\"",
                     sessionId, ctx.getAsrText(), ctx.getReplyText());
+
+            // 异步评测（语法纠错 + 发音评分），不阻塞主流程
+            var asrText = ctx.getAsrText();
+            var audioBytes = ctx.getAudioBytes();
+            var sc = scenarioCode;
+            if (asrText != null && !asrText.isBlank()) {
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        log.info("WS async eval starting: sessionId={}", sessionId);
+                        EvaluationResult eval = evaluationService.evaluate(
+                                sessionId, asrText, Scenario.fromCode(sc), audioBytes);
+                        log.info("WS async eval completed: sessionId={}, score={}", sessionId, eval.getScore());
+                        EvaluationResultPublisher.publish(sessionId, eval);
+                    } catch (Exception ex) {
+                        log.warn("WS async eval failed: sessionId={}, {}", sessionId, ex.getMessage());
+                    }
+                });
+            }
+
         } catch (Exception e) {
             log.error("Process audio failed: sessionId={}", sessionId, e);
             sendJson(session, "{\"error\":\"processing error\"}");

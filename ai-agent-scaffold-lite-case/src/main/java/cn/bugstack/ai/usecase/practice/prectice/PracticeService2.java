@@ -23,7 +23,11 @@ public class PracticeService2 implements IPracticeService2 {
     public PracticeResult handleMessage(HandlePracticeMessageCommandEntity request) throws Exception {
         long start = System.currentTimeMillis();
         DefaultPracticeFactory.DynamicContext ctx = new DefaultPracticeFactory.DynamicContext();
-        ctx.setSessionId(request.getSessionId());
+                ctx.setSessionId(request.getSessionId());
+        // 文本模式：将 req.text 设为 asrText
+        if (request.getText() != null && !request.getText().isBlank()) {
+            ctx.setAsrText(request.getText());
+        }
 
         StrategyHandler<HandlePracticeMessageCommandEntity, DefaultPracticeFactory.DynamicContext, PracticeResult> handler =
                 defaultPracticeFactory.strategyHandler();

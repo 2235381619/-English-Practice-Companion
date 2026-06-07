@@ -5,10 +5,14 @@ import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandE
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import cn.bugstack.ai.types.enums.ResponseCode;
 import cn.bugstack.ai.domain.practice.service.IChatLlmService;
+import cn.bugstack.ai.domain.practice.service.IEvaluationService;
+import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
+import cn.bugstack.ai.domain.practice.model.valobj.Scenario;
 import cn.bugstack.ai.usecase.practice.IPracticeService2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -26,13 +30,42 @@ public class PracticeController {
     private IPracticeService2 practiceService2;
     @Resource
     private IChatLlmService chatLlmService;
+    @Resource
+    private IEvaluationService evaluationService;
+
+    /** 会话ID → 场景码 */
+    private static final java.util.concurrent.ConcurrentHashMap<String, String> sessionScenarios = new java.util.concurrent.ConcurrentHashMap<>();
 
     @PostMapping("text")
     public Response<PracticeResult> submitText(@RequestBody HandlePracticeMessageCommandEntity request) {
         try {
-            request.setInputType(2);
+                        request.setInputType(2);
             PracticeResult result = practiceService2.handleMessage(request);
+
+            // 同步评测（语法纠错 + 发音评分），包含在响应中
+            if (result.getAsrText() != null && !result.getAsrText().isBlank()) {
+                try {
+                    String sc = sessionScenarios.getOrDefault(request.getSessionId(), "interview");
+                    Scenario scenario = Scenario.fromCode(sc);
+                    EvaluationResult eval = evaluationService.evaluate(
+                            request.getSessionId(), result.getAsrText(), scenario,
+                            request.getAudioData());
+                    result.setCorrectedText(eval.getCorrectedText());
+                    result.setGrammarIssues(eval.getGrammarIssues());
+                    result.setSuggestions(eval.getSuggestions());
+                    result.setScore(eval.getScore());
+                    result.setIseTotalScore(eval.getIseTotalScore());
+                    result.setIseAccuracyScore(eval.getIseAccuracyScore());
+                    result.setIseFluencyScore(eval.getIseFluencyScore());
+                    result.setIseIntegrityScore(eval.getIseIntegrityScore());
+                    log.info("Eval included: sessionId={}, score={}", request.getSessionId(), eval.getScore());
+                } catch (Exception e) {
+                    log.warn("Sync eval failed: {}", e.getMessage());
+                }
+            }
+
             java.util.Map<String, Object> round = new java.util.HashMap<>();
+            Map<String, Object> round = new HashMap<>();
             round.put("asrText", result.getAsrText());
             round.put("replyText", result.getReplyText());
 //            round.put("correctedText", result.getCorrectedText());
@@ -84,7 +117,8 @@ public class PracticeController {
     @PostMapping("scenario/{sessionId}/{scenarioCode}")
     public Response<Void> registerScenario(@PathVariable String sessionId, @PathVariable String scenarioCode) {
         try {
-            chatLlmService.chatRegister(sessionId, scenarioCode);
+                        chatLlmService.chatRegister(sessionId, scenarioCode);
+            sessionScenarios.put(sessionId, scenarioCode);
             log.info("Scenario registered: sessionId={}, scenario={}", sessionId, scenarioCode);
             return Response.<Void>builder()
                     .code(ResponseCode.SUCCESS.getCode())
