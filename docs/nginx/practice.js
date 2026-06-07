@@ -199,6 +199,7 @@ function handleResult(data) {
   if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";
   updateUI();
+  setTimeout(fetchSessionReport, 500);
 }
 
 
@@ -216,17 +217,21 @@ function handleEvaluation(data) {
 }
 
 
-function handleEvaluation(data) {
-  if (messages.length > 0) {
-    var last = messages[messages.length - 1];
-    if (last.role === "assistant") {
-      if (data.correctedText) last.correctedText = data.correctedText;
-      if (data.grammarIssues) last.grammarIssues = data.grammarIssues;
-      if (data.suggestions) last.suggestions = data.suggestions;
-      if (data.score) last.score = data.score;
-      renderMessages();
-    }
-  }
+
+function fetchSessionReport() {
+  if (!sessionId) return;
+  fetch(PRACTICE_API + "/session/" + sessionId + "/report")
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json.code === "0000" && json.data && json.data.rounds) {
+        var rounds = json.data.rounds;
+        var last = rounds[rounds.length - 1];
+        if (last && (last.correctedText || last.score)) {
+          handleEvaluation(last);
+        }
+      }
+    })
+    .catch(function(e) { console.warn("Report fetch failed:", e); });
 }
 
 function addMessage(role, content) { messages.push({ role: role, content: content }); renderMessages(); }
