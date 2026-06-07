@@ -35,3 +35,13 @@ public class EvaluationResult {
     private String aiReply;
 }
 
+    /** ISE 发音总分 */
+    private Double iseTotalScore;
+    /** ISE 准确度分 */
+    private Double iseAccuracyScore;
+    /** ISE 流利度分 */
+    private Double iseFluencyScore;
+    /** ISE 完整度分 */
+    private Double iseIntegrityScore;
+
+
