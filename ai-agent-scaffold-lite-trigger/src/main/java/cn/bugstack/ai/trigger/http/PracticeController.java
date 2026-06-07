@@ -62,6 +62,10 @@ public class PracticeController {
             request.setInputType(1);
             PracticeResult result = practiceService2.handleMessage(request);
             log.info("Practice audio: sessionId={}, asrText={}, reply={}",
+            java.util.Map<String, Object> round = new java.util.HashMap<>();
+            round.put("asrText", result.getAsrText());
+            round.put("replyText", result.getReplyText());
+            PracticeAudioWebSocketHandler.saveRound(request.getSessionId(), round);
                     request.getSessionId(), result.getAsrText(), result.getReplyText());
             return Response.<PracticeResult>builder()
                     .code(ResponseCode.SUCCESS.getCode())
@@ -180,4 +184,5 @@ public class PracticeController {
                 .body(bytes);
     }
 }
+
 
