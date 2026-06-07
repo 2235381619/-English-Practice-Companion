@@ -180,6 +180,9 @@ function handleResult(data) {
     messages.push({ role: "assistant", content: reply, correctedText: data.correctedText || "", grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || [], score: data.score || 0 });
     renderMessages();
   }
+  if (data.audioUrl) {
+    new Audio(data.audioUrl).play().catch(function(e) { console.warn('Audio playback failed:', e); });
+  }
   mode = "idle";
   if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";

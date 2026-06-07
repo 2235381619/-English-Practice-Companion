@@ -3,7 +3,7 @@
 ## 待办清单
 
 - [x] **请求接入 `voice` 字段** — 请求体已支持 `voice.speed/volume/pitch`
-- [ ] **播放 `audioUrl`** — 响应里的 `audioUrl` 需前端 `new Audio(url).play()` 播出来
+- [x] **播放 `audioUrl`** — 响应里的 `audioUrl` 需前端 `new Audio(url).play()` 播出来
 
 ---
 
