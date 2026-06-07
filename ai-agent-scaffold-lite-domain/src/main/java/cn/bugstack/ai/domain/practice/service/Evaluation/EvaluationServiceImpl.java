@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class EvaluationService implements IEvaluationService {
+public class EvaluationServiceImpl implements IEvaluationService {
 
     private static final String EVAL_SYSTEM_PROMPT = """
             You are a professional English tutor. Evaluate the user's speech.
