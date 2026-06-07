@@ -14,6 +14,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
         try {
             String systemText = EVAL_SYSTEM_PROMPT + " Scenario: " + scenario.getSystemPrompt();
             chatMemory.add(sessionId, new UserMessage(userText));
-            java.util.List<Message> messages = new java.util.ArrayList<>(chatMemory.get(sessionId).size() + 1);
+            List<Message> messages = new ArrayList<>(chatMemory.get(sessionId).size() + 1);
             messages.add(new SystemMessage(systemText));
             messages.addAll(chatMemory.get(sessionId));
             Prompt prompt = new Prompt(messages);

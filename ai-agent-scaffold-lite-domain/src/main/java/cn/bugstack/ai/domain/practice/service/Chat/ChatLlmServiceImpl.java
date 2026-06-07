@@ -3,6 +3,7 @@ package cn.bugstack.ai.domain.practice.service.Chat;
 import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -33,6 +34,9 @@ public class ChatLlmServiceImpl implements IChatLlmService {
 
     @Resource(name = "practiceChatModel")
     private ChatModel chatModel;
+
+    @Resource(name = "chatChatMemory")
+    private ChatMemory chatMemory;
 
 
     @Override
