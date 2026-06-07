@@ -21,7 +21,11 @@ import java.util.List;
 @Service
 public class EvaluationServiceImpl implements IEvaluationService {
 
-    private static final String EVAL_SYSTEM_PROMPT = "You are a professional English tutor. Evaluate the user's latest speech.";
+    private static final String EVAL_SYSTEM_PROMPT = """
+        You are a professional English tutor. Evaluate the user's latest speech.
+        Scenario: {scenarioPrompt}
+        Respond with valid JSON only. Fields: correctedText, grammarIssues (array), suggestions (array), score (1-10), aiReply.
+        """;
 
     @Resource(name = "evlChatModel")
     private ChatModel evalChatModel;
@@ -33,7 +37,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     public EvaluationResult evaluate(String sessionId, String userText, Scenario scenario) {
         log.info("GPT evaluate request: {}", userText);
         try {
-            String systemText = EVAL_SYSTEM_PROMPT + " Scenario: " + scenario.getSystemPrompt();
+            String systemText = EVAL_SYSTEM_PROMPT.replace("{scenarioPrompt}", scenario.getSystemPrompt());
             chatMemory.add(sessionId, new UserMessage(userText));
             List<Message> messages = new ArrayList<>(chatMemory.get(sessionId).size() + 1);
             messages.add(new SystemMessage(systemText));
@@ -44,6 +48,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
             return EvaluationResult.builder()
                     .originalText(userText)
                     .correctedText(response)
+                    .suggestions(new ArrayList<>().add())
                     .aiReply(response)
                     .score(5)
                     .build();
