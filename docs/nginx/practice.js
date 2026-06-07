@@ -187,7 +187,7 @@ function handleResult(data) {
   if (data.asrText) addMessage("user", data.asrText);
   var reply = data.replyText || data.reply || data.aiReply || "";
   if (reply) {
-    messages.push({ role: "assistant", content: reply, correctedText: data.correctedText || "", grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || [], score: data.score || 0 });
+    var msg = { role: "assistant", content: reply, correctedText: data.correctedText || "", grammarIssues: data.grammarIssues || [], suggestions: data.suggestions || [], score: data.score || 0 }; if (data.iseTotalScore) { msg.iseTotalScore = data.iseTotalScore; msg.iseAccuracyScore = data.iseAccuracyScore; msg.iseFluencyScore = data.iseFluencyScore; msg.iseIntegrityScore = data.iseIntegrityScore; messages.push(msg); renderMessages(); if (data.iseTotalScore) updateRadarChart(); } else { messages.push(msg); }
     renderMessages();
   }
   if (data.audioData) {
