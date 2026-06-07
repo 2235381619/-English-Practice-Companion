@@ -92,10 +92,10 @@ function startRecording() {
     var ws = new WebSocket(WS_BASE + "/" + sessionId);
     ws.binaryType = "arraybuffer";
     ws.onopen = function() { ws.send(JSON.stringify({ type: "config" })); };
+    var _evalTimer = null;
     ws.onmessage = function(ev) {
-      if (typeof ev.data === "string") { try { var d = JSON.parse(ev.data); if (d.type === "evaluation") { handleEvaluation(d); } else { handleResult(d); } } catch(e) {} }
+      if (typeof ev.data === "string") { try { var d = JSON.parse(ev.data); if (d.type === "evaluation") { if (_evalTimer) { clearTimeout(_evalTimer); _evalTimer = null; } handleEvaluation(d); if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; } } else { handleResult(d); _evalTimer = setTimeout(function() { if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; } }, 12000); } } catch(e) {} }
     };
-    ws.onerror = function() {};
     ws.onclose = function() { if (mode === "recording") stopRecording(); };
     rec.ws = ws;
   } catch(e) { return; }
@@ -194,7 +194,6 @@ function handleResult(data) {
     new Audio("data:audio/mp3;base64," + data.audioData).play().catch(function(e) { console.warn("Audio playback failed:", e); });
   }
   mode = "idle";
-  if (rec.ws) { try { rec.ws.close(); } catch(e) {} rec.ws = null; }
   document.getElementById("practiceScenario").textContent = "Press mic to speak";
   updateUI();
   setTimeout(fetchSessionReport, 500);
@@ -214,6 +213,7 @@ function handleEvaluation(data) {
       if (data.iseFluencyScore) last.iseFluencyScore = data.iseFluencyScore;
       if (data.iseIntegrityScore) last.iseIntegrityScore = data.iseIntegrityScore;
       renderMessages();
+      updateRadarChart();
     }
   }
 }
@@ -247,11 +247,39 @@ function fetchSessionReport(retries) {
     });
 }
 
+
+function calcAvgISEScores() {
+  var acc = 0, flu = 0, integ = 0, total = 0, count = 0;
+  for (var i = 0; i < messages.length; i++) {
+    var m = messages[i];
+    if (m.role === "assistant" && m.iseTotalScore > 0) {
+      acc += m.iseAccuracyScore;
+      flu += m.iseFluencyScore;
+      integ += m.iseIntegrityScore;
+      total += m.iseTotalScore;
+      count++;
+    }
+  }
+  if (count === 0) return null;
+  return { accuracy: acc / count, fluency: flu / count, integrity: integ / count, total: total / count };
+}
+
+function updateRadarChart() {
+  var c = document.getElementById("panelRadarChart");
+  if (!c) return;
+  var s = calcAvgISEScores();
+  if (!s) {
+    c.innerHTML = generateRadarChart(60, 60, 60, 60);
+    return;
+  }
+  c.innerHTML = '<div style="text-align:center;font-size:12px;color:#475569;font-weight:600;margin-bottom:2px">Avg ' + s.total.toFixed(1) + '</div>' + generateRadarChart(s.accuracy, s.fluency, s.integrity, s.total);
+}
+
 function generateRadarChart(acc, flu, integ, total) {
-  var cx = 70, cy = 70, r = 50;
+  var cx = 100, cy = 100, r = 65;
   var labels = ["Accuracy","Fluency","Integrity","Total"];
   var vals = [acc, flu, integ, total];
-  var svg = '<svg width="140" height="140" viewBox="0 0 140 140" style="display:block;margin:6px auto">';
+  var svg = '<svg width="200" height="200" viewBox="0 0 200 200" style="display:block;margin:0 auto">';
   for (var ring = 1; ring <= 3; ring++) {
     var rr = (ring / 3) * r;
     svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + rr + '" fill="none" stroke="#e2e8f0" stroke-width="1"/>';
@@ -273,11 +301,11 @@ function generateRadarChart(acc, flu, integ, total) {
   for (var i = 0; i < 4; i++) {
     var rad = angles[i] * Math.PI / 180;
     var vr = (vals[i] / 100) * r;
-    svg += '<circle cx="' + (cx + vr * Math.sin(rad)).toFixed(1) + '" cy="' + (cy - vr * Math.cos(rad)).toFixed(1) + '" r="3" fill="#2563eb"/>';
+    svg += '<circle cx="' + (cx + vr * Math.sin(rad)).toFixed(1) + '" cy="' + (cy - vr * Math.cos(rad)).toFixed(1) + '" r="3.5" fill="#2563eb"/>';
   }
   for (var i = 0; i < 4; i++) {
     var rad = angles[i] * Math.PI / 180;
-    svg += '<text x="' + (cx + (r + 14) * Math.sin(rad)).toFixed(1) + '" y="' + (cy - (r + 14) * Math.cos(rad)).toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#64748b">' + labels[i] + '</text>';
+    svg += '<text x="' + (cx + (r + 16) * Math.sin(rad)).toFixed(1) + '" y="' + (cy - (r + 16) * Math.cos(rad)).toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#64748b" style="font-family:sans-serif;font-weight:500">' + labels[i] + '</text>';
   }
   svg += '</svg>';
   return svg;
@@ -298,7 +326,7 @@ function renderMessages() {
       return '<div class="pmsg user"><div class="pmsg-bubble user-bubble"><div class="pmsg-user-label">You</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
     }
     var evalHtml = "";
-    var hasEval = m.correctedText || (m.grammarIssues && m.grammarIssues.length > 0) || (m.suggestions && m.suggestions.length > 0) || m.score > 0 || m.iseTotalScore > 0;
+    var hasEval = m.correctedText || (m.grammarIssues && m.grammarIssues.length > 0) || (m.suggestions && m.suggestions.length > 0) || m.score > 0;
     if (hasEval) {
       evalHtml += "<div class=\"msg-eval\">";
       if (m.correctedText && m.correctedText !== m.content) {
@@ -313,10 +341,6 @@ function renderMessages() {
       }
       if (m.score > 0) {
         evalHtml += "<div class=\"eval-line eval-score\">Score: " + m.score + "/5</div>";
-      }
-      if (m.iseTotalScore > 0 || m.iseAccuracyScore > 0 || m.iseFluencyScore > 0 || m.iseIntegrityScore > 0) {
-        evalHtml += '<div class="eval-section-title" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;text-align:center">Pronunciation</div>';
-        evalHtml += generateRadarChart(m.iseAccuracyScore, m.iseFluencyScore, m.iseIntegrityScore, m.iseTotalScore);
       }
       evalHtml += "</div>";
     }

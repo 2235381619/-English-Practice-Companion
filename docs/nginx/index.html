@@ -122,8 +122,12 @@
                 <label>Pitch</label>
                 <input type="range" class="voice-slider" id="voicePitch" min="0" max="100" value="50">
                 <span class="voice-slider-value" id="voicePitchVal">50</span>
-              </div>
-              <button class="export-btn" onclick="exportSession()" id="exportBtn">Download Chat</button>
+            </div>
+            <div class="practice-panel-section">
+              <div class="practice-panel-section-title">Pronunciation</div>
+              <div id="panelRadarChart" style="padding:10px 0"><svg width="200" height="200" viewBox="0 0 200 200" style="display:block;margin:0 auto"><circle cx="100" cy="100" r="21.7" fill="none" stroke="#e2e8f0" stroke-width="1"/><circle cx="100" cy="100" r="43.3" fill="none" stroke="#e2e8f0" stroke-width="1"/><circle cx="100" cy="100" r="65" fill="none" stroke="#e2e8f0" stroke-width="1"/><line x1="100" y1="100" x2="100" y2="35" stroke="#e2e8f0" stroke-width="1"/><line x1="100" y1="100" x2="165" y2="100" stroke="#e2e8f0" stroke-width="1"/><line x1="100" y1="100" x2="100" y2="165" stroke="#e2e8f0" stroke-width="1"/><line x1="100" y1="100" x2="35" y2="100" stroke="#e2e8f0" stroke-width="1"/><polygon points="100,67.5 132.5,100 100,132.5 67.5,100" fill="rgba(148,163,184,0.1)" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,3"/><circle cx="100" cy="67.5" r="3" fill="#cbd5e1" opacity="0.5"/><circle cx="132.5" cy="100" r="3" fill="#cbd5e1" opacity="0.5"/><circle cx="100" cy="132.5" r="3" fill="#cbd5e1" opacity="0.5"/><circle cx="67.5" cy="100" r="3" fill="#cbd5e1" opacity="0.5"/><text x="100" y="17" text-anchor="middle" font-size="12" fill="#94a3b8" style="font-family:sans-serif;font-weight:500">Accuracy</text><text x="185" y="104" text-anchor="middle" font-size="12" fill="#94a3b8" style="font-family:sans-serif;font-weight:500">Fluency</text><text x="100" y="191" text-anchor="middle" font-size="12" fill="#94a3b8" style="font-family:sans-serif;font-weight:500">Integrity</text><text x="15" y="104" text-anchor="middle" font-size="12" fill="#94a3b8" style="font-family:sans-serif;font-weight:500">Total</text></svg></div>
+            </div>
+            <button class="export-btn" onclick="exportSession()" id="exportBtn" style="margin-top:auto">Download Chat</button>
             </div>
           </div>
         </div>

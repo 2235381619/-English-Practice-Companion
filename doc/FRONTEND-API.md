@@ -84,6 +84,24 @@ POST /api/v1/practice/session
 
 ## 4. WebSocket 音频输入
 
+WebSocket 收到主响应后请保持连接，等待异步评测结果推送：
+
+```javascript
+ws.onmessage = function(ev) {
+  var d = JSON.parse(ev.data);
+  if (d.type === "evaluation") {
+    handleEvaluation(d);
+    ws.close(); // 评测结果到齐，可以关WS
+  } else {
+    handleResult(d);
+    // ⚠️ 不要在这里关 ws，等待 type: "evaluation" 消息
+    // 设置 10~15s 超时兜底
+  }
+};
+```
+
+
+
 ```
 ws://localhost:8091/practice/audio/{sessionId}
 ```
