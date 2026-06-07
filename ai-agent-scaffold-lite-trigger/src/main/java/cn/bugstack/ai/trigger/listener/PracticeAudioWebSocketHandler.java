@@ -1,6 +1,7 @@
 package cn.bugstack.ai.trigger.listener;
 
 import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
+import cn.bugstack.ai.domain.practice.event.EvaluationResultPublisher;
 import cn.bugstack.ai.domain.practice.model.valobj.EvaluationResult;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.usecase.practice.prectice.factory.DefaultPracticeFactory;
@@ -17,28 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 口语练习 WebSocket Handler — 基于 Spring WebSocket API
  *
- * ws://host:port/practice/audio/{sessionId
-    /**
-     * 异步评测结果推送到前端 WebSocket
-     */
-    public static void sendEvalResult(String sessionId, EvaluationResult eval) {
-        WebSocketSession session = liveSessions.get(sessionId);
-        if (session != null && session.isOpen()) {
-            try {
-                com.alibaba.fastjson.JSONObject json = new com.alibaba.fastjson.JSONObject();
-                json.put("type", "evaluation");
-                json.put("correctedText", eval.getCorrectedText() != null ? eval.getCorrectedText() : "");
-                json.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
-                json.put("suggestions", eval.getSuggestions() != null ? eval.getSuggestions() : new java.util.ArrayList());
-                json.put("score", eval.getScore());
-                session.sendMessage(new TextMessage(json.toJSONString()));
-            } catch (Exception e) {
-                log.warn("Send eval result failed: sessionId={}", sessionId, e);
-            }
-        }
-    }
-
-}
+ * ws://host:port/practice/audio/{sessionId}
  * 客户端发送二进制 PCM 帧（16kHz 16bit Mono），
  * 发送文本 "END" 触发 ASR + 评测，返回评测 JSON。
  */
@@ -201,5 +181,25 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
                 .replace("\n", "\\n")
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
+    }
+
+    /**
+     * 异步评测结果推送到前端 WebSocket
+     */
+    public static void sendEvalResult(String sessionId, EvaluationResult eval) {
+        WebSocketSession session = liveSessions.get(sessionId);
+        if (session != null && session.isOpen()) {
+            try {
+                com.alibaba.fastjson.JSONObject json = new com.alibaba.fastjson.JSONObject();
+                json.put("type", "evaluation");
+                json.put("correctedText", eval.getCorrectedText() != null ? eval.getCorrectedText() : "");
+                json.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
+                json.put("suggestions", eval.getSuggestions() != null ? eval.getSuggestions() : new java.util.ArrayList());
+                json.put("score", eval.getScore());
+                session.sendMessage(new TextMessage(json.toJSONString()));
+            } catch (Exception e) {
+                log.warn("Send eval result failed: sessionId={}", sessionId, e);
+            }
+        }
     }
 }
