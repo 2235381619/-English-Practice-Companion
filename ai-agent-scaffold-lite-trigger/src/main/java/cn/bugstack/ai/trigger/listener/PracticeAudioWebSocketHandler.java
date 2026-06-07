@@ -233,8 +233,11 @@ public class PracticeAudioWebSocketHandler extends AbstractWebSocketHandler {
         round.put("correctedText", eval.getCorrectedText() != null ? eval.getCorrectedText() : "");
         round.put("grammarIssues", eval.getGrammarIssues() != null ? eval.getGrammarIssues() : new java.util.ArrayList());
         round.put("suggestions", eval.getSuggestions() != null ? eval.getSuggestions() : new java.util.ArrayList());
-        round.put("score", eval.getScore());
-        saveRound(sessionId, round);
+                round.put("score", eval.getScore());
+        round.put("iseTotalScore", eval.getIseTotalScore());
+        round.put("iseAccuracyScore", eval.getIseAccuracyScore());
+        round.put("iseFluencyScore", eval.getIseFluencyScore());
+        round.put("iseIntegrityScore", eval.getIseIntegrityScore());saveRound(sessionId, round);
 
         WebSocketSession session = liveSessions.get(sessionId);
         if (session != null && session.isOpen()) {
