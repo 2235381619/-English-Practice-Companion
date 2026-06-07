@@ -1041,3 +1041,6 @@ input, textarea {
 .export-btn:active {
   transform: scale(0.98);
 }
+.eval-ise { display: flex; justify-content: space-between; font-size: 12px; padding: 1px 0; }
+.eval-ise-label { color: var(--color-text-tertiary); }
+.eval-ise-value { font-weight: 600; color: var(--color-accent); font-variant-numeric: tabular-nums; }

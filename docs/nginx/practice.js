@@ -32,8 +32,6 @@ function initPractice() {
       "<div class=\"scenario-card\" onclick=\"selectScenario('meeting')\"><div class=\"scenario-card-icon\">&#x1F4CB;</div><div class=\"scenario-card-name\">Meeting</div><div class=\"scenario-card-desc\">Business meeting</div></div>";
   }
   initVoiceSettings();
-  registerScenario(sessionId, code);
-  initVoiceSettings();
   updateUI();
 }
 
@@ -211,6 +209,10 @@ function handleEvaluation(data) {
       if (data.grammarIssues) last.grammarIssues = data.grammarIssues;
       if (data.suggestions) last.suggestions = data.suggestions;
       if (data.score) last.score = data.score;
+      if (data.iseTotalScore) last.iseTotalScore = data.iseTotalScore;
+      if (data.iseAccuracyScore) last.iseAccuracyScore = data.iseAccuracyScore;
+      if (data.iseFluencyScore) last.iseFluencyScore = data.iseFluencyScore;
+      if (data.iseIntegrityScore) last.iseIntegrityScore = data.iseIntegrityScore;
       renderMessages();
     }
   }
@@ -244,6 +246,44 @@ function fetchSessionReport(retries) {
       }
     });
 }
+
+function generateRadarChart(acc, flu, integ, total) {
+  var cx = 70, cy = 70, r = 50;
+  var labels = ["Accuracy","Fluency","Integrity","Total"];
+  var vals = [acc, flu, integ, total];
+  var svg = '<svg width="140" height="140" viewBox="0 0 140 140" style="display:block;margin:6px auto">';
+  for (var ring = 1; ring <= 3; ring++) {
+    var rr = (ring / 3) * r;
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + rr + '" fill="none" stroke="#e2e8f0" stroke-width="1"/>';
+  }
+  var angles = [0, 90, 180, 270];
+  for (var i = 0; i < 4; i++) {
+    var rad = angles[i] * Math.PI / 180;
+    var ex = cx + r * Math.sin(rad);
+    var ey = cy - r * Math.cos(rad);
+    svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + ex + '" y2="' + ey + '" stroke="#e2e8f0" stroke-width="1"/>';
+  }
+  var pts = "";
+  for (var i = 0; i < 4; i++) {
+    var rad = angles[i] * Math.PI / 180;
+    var vr = (vals[i] / 100) * r;
+    pts += (cx + vr * Math.sin(rad)).toFixed(1) + "," + (cy - vr * Math.cos(rad)).toFixed(1) + " ";
+  }
+  svg += '<polygon points="' + pts.trim() + '" fill="rgba(37,99,235,0.15)" stroke="#2563eb" stroke-width="2"/>';
+  for (var i = 0; i < 4; i++) {
+    var rad = angles[i] * Math.PI / 180;
+    var vr = (vals[i] / 100) * r;
+    svg += '<circle cx="' + (cx + vr * Math.sin(rad)).toFixed(1) + '" cy="' + (cy - vr * Math.cos(rad)).toFixed(1) + '" r="3" fill="#2563eb"/>';
+  }
+  for (var i = 0; i < 4; i++) {
+    var rad = angles[i] * Math.PI / 180;
+    svg += '<text x="' + (cx + (r + 14) * Math.sin(rad)).toFixed(1) + '" y="' + (cy - (r + 14) * Math.cos(rad)).toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#64748b">' + labels[i] + '</text>';
+  }
+  svg += '</svg>';
+  return svg;
+}
+
+
 function exportSession() {
   if (!sessionId) return;
   window.open(API_BASE + "/practice/session/" + sessionId + "/export");
@@ -258,7 +298,7 @@ function renderMessages() {
       return '<div class="pmsg user"><div class="pmsg-bubble user-bubble"><div class="pmsg-user-label">You</div><div class="pmsg-text">' + esc(m.content) + '</div></div></div>';
     }
     var evalHtml = "";
-    var hasEval = m.correctedText || (m.grammarIssues && m.grammarIssues.length > 0) || (m.suggestions && m.suggestions.length > 0) || m.score > 0;
+    var hasEval = m.correctedText || (m.grammarIssues && m.grammarIssues.length > 0) || (m.suggestions && m.suggestions.length > 0) || m.score > 0 || m.iseTotalScore > 0;
     if (hasEval) {
       evalHtml += "<div class=\"msg-eval\">";
       if (m.correctedText && m.correctedText !== m.content) {
@@ -272,7 +312,11 @@ function renderMessages() {
         m.suggestions.forEach(function(s) { evalHtml += "<div class=\"eval-line eval-suggestion\">- " + esc(s) + "</div>"; });
       }
       if (m.score > 0) {
-        evalHtml += "<div class=\"eval-line eval-score\">Score: " + m.score + "/10</div>";
+        evalHtml += "<div class=\"eval-line eval-score\">Score: " + m.score + "/5</div>";
+      }
+      if (m.iseTotalScore > 0 || m.iseAccuracyScore > 0 || m.iseFluencyScore > 0 || m.iseIntegrityScore > 0) {
+        evalHtml += '<div class="eval-section-title" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;text-align:center">Pronunciation</div>';
+        evalHtml += generateRadarChart(m.iseAccuracyScore, m.iseFluencyScore, m.iseIntegrityScore, m.iseTotalScore);
       }
       evalHtml += "</div>";
     }
