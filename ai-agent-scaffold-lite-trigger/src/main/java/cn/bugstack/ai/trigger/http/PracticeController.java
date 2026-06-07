@@ -4,12 +4,14 @@ import cn.bugstack.ai.api.response.Response;
 import cn.bugstack.ai.domain.practice.model.entity.HandlePracticeMessageCommandEntity;
 import cn.bugstack.ai.domain.practice.model.valobj.PracticeResult;
 import cn.bugstack.ai.trigger.listener.PracticeAudioWebSocketHandler;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import cn.bugstack.ai.types.enums.ResponseCode;
 import cn.bugstack.ai.domain.practice.service.IChatLlmService;
 import cn.bugstack.ai.usecase.practice.IPracticeService2;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
@@ -129,4 +131,53 @@ public class PracticeController {
                     .build();
         }
     }
+
+    @GetMapping("session/{sessionId}/export")
+    public ResponseEntity<byte[]> exportSession(@PathVariable String sessionId) {
+        var rounds = PracticeAudioWebSocketHandler.getSessionRounds(sessionId);
+        if (rounds == null || rounds.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Conversation Report\r\n");
+        sb.append("Session: ").append(sessionId).append("\r\n");
+        sb.append("==================\r\n\r\n");
+
+        int roundNum = 0;
+        for (var entry : rounds) {
+            boolean isConversation = entry.containsKey("asrText") || entry.containsKey("replyText");
+            boolean isEvaluation = entry.containsKey("correctedText") || entry.containsKey("score");
+
+            if (isConversation) {
+                roundNum++;
+                sb.append("--- Round ").append(roundNum).append(" ---\r\n");
+                Object asr = entry.get("asrText");
+                if (asr != null) sb.append("You: ").append(asr).append("\r\n");
+                Object reply = entry.get("replyText");
+                if (reply != null) sb.append("Tutor: ").append(reply).append("\r\n");
+            }
+            if (isEvaluation) {
+                Object corrected = entry.get("correctedText");
+                if (corrected != null) sb.append("Corrected: ").append(corrected).append("\r\n");
+                sb.append("Score: ").append(entry.getOrDefault("score", 0)).append("\r\n");
+                Object issues = entry.get("grammarIssues");
+                if (issues instanceof List && !((List<?>) issues).isEmpty()) {
+                    sb.append("Issues: ").append(String.join("; ", (List<String>) issues)).append("\r\n");
+                }
+                Object suggestions = entry.get("suggestions");
+                if (suggestions instanceof List && !((List<?>) suggestions).isEmpty()) {
+                    sb.append("Tips: ").append(String.join("; ", (List<String>) suggestions)).append("\r\n");
+                }
+                sb.append("\r\n");
+            }
+        }
+
+        byte[] bytes = sb.toString().getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sessionId + ".txt\"")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(bytes);
+    }
 }
+
